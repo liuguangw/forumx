@@ -12,26 +12,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
 
-    - name: Set up Cache
-      uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
+      - name: Set up Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
-    - name: Test
-      run: |
-          go vet ./...
-          go test -v ./...
+      - name: Download Modules
+        run: go mod download
 
-    - name: Build
-      run: go build -v ./...
+      - name: Test
+        run: |
+            go vet ./...
+            go test -v ./...
+
+      - name: Run version command
+        run: |
+          appVersion=1.0.0
+          appBuildDate=$(TZ=Asia/Shanghai date +%F)
+          appGitCommitHash=${GITHUB_SHA}
+          appModuleName=github.com/${GITHUB_REPOSITORY}
+          buildLdFlags="-X ${appModuleName}/cmd.appBuildDate=${appBuildDate}"
+          buildLdFlags="${buildLdFlags} -X ${appModuleName}/cmd.appGitCommitHash=${appGitCommitHash}"
+          go run -ldflags "${buildLdFlags}" . version

@@ -35,6 +35,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
+    - name: Download Modules
+      run: go mod download
+
     - name: Test
       #测试只运行一次
       if: matrix.os == 'linux' && matrix.arch == 'amd64'
@@ -47,10 +50,17 @@ jobs:
         GOOS: ${{ matrix.os }}
         GOARCH: ${{ matrix.arch }}
       run: |
+        appVersion=1.0.0
+        appBuildDate=$(TZ=Asia/Shanghai date +%F)
+        appGitCommitHash=${GITHUB_SHA}
+        appModuleName=github.com/${GITHUB_REPOSITORY}
+        buildLdFlags="-X ${appModuleName}/cmd.appBuildDate=${appBuildDate}"
+        buildLdFlags="${buildLdFlags} -X ${appModuleName}/cmd.appGitCommitHash=${appGitCommitHash}"
+
         EXTRA_FILES="LICENSE README.md"
         SAVE_FILE_NAME="release-${GOOS}-${GOARCH}"
         if [[ "${GOOS}" == "windows" ]]; then SAVE_FILE_NAME="${SAVE_FILE_NAME}.exe" ; fi
-        go build -v -o ${SAVE_FILE_NAME} .
+        go build -v -ldflags "${buildLdFlags}" -o ${SAVE_FILE_NAME} .
         zip -r release-${GOOS}-${GOARCH}.zip ${SAVE_FILE_NAME} ${EXTRA_FILES}
         rm ${SAVE_FILE_NAME}
         ls -al

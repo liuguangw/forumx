@@ -1,8 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"github.com/liuguangw/forumx/cmd"
+	"log"
+)
 
 func main() {
-	fmt.Println("hello world")
-	fmt.Printf("a = %d\n", 12345)
+	if err := cmd.Execute(); err != nil {
+		log.Fatalln(err)
+	}
 }
