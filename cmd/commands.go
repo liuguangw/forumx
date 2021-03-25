@@ -1,19 +1,21 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/urfave/cli/v2"
+)
 
-func prepareRootCommand() *cobra.Command {
-	rootCmd := &cobra.Command{
-		Use:   "forumx",
-		Short: "forumx is an efficient forum service API",
+func prepareMainApp() *cli.App {
+	mainApp := &cli.App{
+		Name:        "forumx",
+		Description: "forumx is an efficient forum service API",
 	}
-	rootCmd.AddCommand(
+	mainApp.Commands = []*cli.Command{
 		versionCommand(),
-	)
-	return rootCmd
+	}
+	return mainApp
 }
 
-func Execute() error {
-	rootCommand := prepareRootCommand()
-	return rootCommand.Execute()
+func Execute(args []string) error {
+	mainApp := prepareMainApp()
+	return mainApp.Run(args)
 }
