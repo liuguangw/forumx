@@ -54,7 +54,8 @@ jobs:
         appBuildTime=$(TZ=Asia/Shanghai date "+%F %T GMT%:z")
         appGitCommitHash=$(git rev-parse HEAD)
         appModuleName=github.com/${GITHUB_REPOSITORY}
-        buildLdFlags="-X '${appModuleName}/cmd.appBuildTime=${appBuildTime}'"
+        buildLdFlags="-X ${appModuleName}/cmd.appVersion=${appVersion}"
+        buildLdFlags="${buildLdFlags} -X '${appModuleName}/cmd.appBuildTime=${appBuildTime}'"
         buildLdFlags="${buildLdFlags} -X ${appModuleName}/cmd.appGitCommitHash=${appGitCommitHash}"
 
         EXTRA_FILES="LICENSE README.md"
@@ -72,4 +73,4 @@ jobs:
           release-*.zip
         draft: true
       env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

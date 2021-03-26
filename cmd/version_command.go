@@ -9,7 +9,7 @@ import (
 
 //此处将会在编译时用ldflags设置变量的值
 var (
-	appVersion       = "1.0.0"
+	appVersion       = "0.0.0"
 	appBuildTime     = "1970-01-01 00:00:00"
 	appGitCommitHash = "0000000000000000000000000000000000000000"
 )
