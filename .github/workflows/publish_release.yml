@@ -9,14 +9,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [linux, darwin, windows]
-        arch: [amd64, arm64]
-        #排除windows arm64
-        exclude:
-          - os: windows
-            arch: arm64
 
     steps:
     - name: Checkout
@@ -39,34 +31,16 @@ jobs:
       run: go mod download -json
 
     - name: Test
-      #测试只运行一次
-      if: matrix.os == 'linux' && matrix.arch == 'amd64'
       run: |
           go vet ./...
           go test -v ./...
 
-    - name: Build for ${{ matrix.os }}(${{ matrix.arch }})
-      env:
-        GOOS: ${{ matrix.os }}
-        GOARCH: ${{ matrix.arch }}
+    - name: Build
       run: |
-        appVersion=1.0.0
-        appBuildTime=$(TZ=Asia/Shanghai date "+%F %T GMT%:z")
-        appGitCommitHash=$(git rev-parse HEAD)
-        appModuleName=github.com/${GITHUB_REPOSITORY}
-        buildLdFlags="-X ${appModuleName}/cmd.appVersion=${appVersion}"
-        buildLdFlags="${buildLdFlags} -X '${appModuleName}/cmd.appBuildTime=${appBuildTime}'"
-        buildLdFlags="${buildLdFlags} -X ${appModuleName}/cmd.appGitCommitHash=${appGitCommitHash}"
-
-        EXTRA_FILES="LICENSE README.md"
-        SAVE_FILE_NAME="release-${GOOS}-${GOARCH}"
-        if [[ "${GOOS}" == "windows" ]]; then SAVE_FILE_NAME="${SAVE_FILE_NAME}.exe" ; fi
-        go build -v -ldflags "${buildLdFlags}" -o ${SAVE_FILE_NAME} .
-        zip -r release-${GOOS}-${GOARCH}.zip ${SAVE_FILE_NAME} ${EXTRA_FILES}
-        rm ${SAVE_FILE_NAME}
+        make all appVersion=1.0.0
         ls -al
 
-    - name: Release for ${{ matrix.os }}(${{ matrix.arch }})
+    - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: |

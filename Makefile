@@ -6,7 +6,7 @@ appModuleName = github.com/liuguangw/$(projectName)
 buildLdFlags =-X $(appModuleName)/cmd.appVersion=$(appVersion)
 buildLdFlags += -X '$(appModuleName)/cmd.appBuildTime=$(appBuildTime)'
 buildLdFlags += -X $(appModuleName)/cmd.appGitCommitHash=$(appGitCommitHash)
-GO_BUILD=go build -v -ldflags "$(buildLdFlags)"
+GO_BUILD=go build -v -ldflags "-w -s $(buildLdFlags)"
 EXTRA_FILES = LICENSE README.md
 
 define build_app
@@ -16,17 +16,14 @@ $(eval GOARCH:=$(2))
 @echo build for \($(GOOS) , $(GOARCH)\)
 $(eval outputFileName:=$(projectName)$(3))
 $(eval zipFileName:=release-$(GOOS)-$(GOARCH).zip)
-@echo $(GO_BUILD) -o ${outputFileName}
-$(GO_BUILD) -o ${outputFileName}
-zip -r ${zipFileName} ${outputFileName} $(EXTRA_FILES)
-rm ${outputFileName}
-ls -al
+@GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO_BUILD) -o ${outputFileName}
+@zip -r ${zipFileName} ${outputFileName} $(EXTRA_FILES)
+@echo -e 'save ${zipFileName} success\n'
+@rm ${outputFileName}
 endef
 
 build:
-	echo $(GO_BUILD) -o $(projectName)
-	$(GO_BUILD) -o $(projectName)
-	ls -al
+	@$(GO_BUILD) -o $(projectName)
 
 all:
 	$(call build_app,linux,amd64)
@@ -39,4 +36,4 @@ clean:
 	rm -rf ./forumx
 	rm -rf ./*.zip
 
-.PHONY: build build_all clean
+.PHONY: build all clean

@@ -41,4 +41,3 @@ jobs:
           make appVersion=1.0.0
           chmod +x ./forumx
           ./forumx version --full
-          make all appVersion=1.0.0
