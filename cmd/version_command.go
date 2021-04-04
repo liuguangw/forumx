@@ -14,6 +14,7 @@ var (
 	appGitCommitHash = "0000000000000000000000000000000000000000"
 )
 
+//展示版本信息的命令
 func versionCommand() *cli.Command {
 	versionCmd := &cli.Command{
 		Name:  "version",
