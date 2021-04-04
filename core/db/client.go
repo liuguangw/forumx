@@ -1,4 +1,4 @@
-package core
+package db
 
 import (
 	"context"
@@ -13,13 +13,13 @@ import (
 var mongoClient *mongo.Client
 
 //获取数据库Client
-func DbClient() (*mongo.Client, error) {
+func Client() (*mongo.Client, error) {
 	if mongoClient != nil {
 		return mongoClient, nil
 	}
-	dbUri := os.Getenv("DB_URI")
+	dbUri := os.Getenv(dbUriEnvKey)
 	if dbUri == "" {
-		return nil, errors.New("DB_URI environment variable not found")
+		return nil, errors.New(dbUriEnvKey + " environment variable not found")
 	}
 	//connect
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

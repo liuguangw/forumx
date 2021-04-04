@@ -16,6 +16,11 @@ func MainCommand() *cli.Command {
 		Action: func(c *cli.Context) error {
 			step := c.Int("step")
 			fmt.Println("migrate: ", step)
+			migrationLogs, err := getInstalledMigrationLogs(1)
+			if err != nil {
+				return err
+			}
+			fmt.Println(migrationLogs)
 			return nil
 		},
 		Subcommands: []*cli.Command{
