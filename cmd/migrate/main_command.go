@@ -1,7 +1,9 @@
 package migrate
 
 import (
+	"errors"
 	"fmt"
+	"github.com/liuguangw/forumx/core"
 	"github.com/urfave/cli/v2"
 )
 
@@ -30,4 +32,46 @@ func MainCommand() *cli.Command {
 		},
 	}
 	return versionCmd
+}
+
+//处理迁移,返回执行的迁移记录列表
+func processMigrate(installedMigrationLogs []*installedMigrationLog, migrations []core.Migration, step int) ([]*installedMigrationLog, error) {
+	//本次迁移的记录
+	var migrationLogs []*installedMigrationLog
+	//迁移的批次
+	migrationBatch := 1
+	if len(installedMigrationLogs) > 0 {
+		lastInstalledMigrationLog := installedMigrationLogs[len(installedMigrationLogs)-1]
+		migrationBatch = lastInstalledMigrationLog.Batch + 1
+	}
+	//遍历需要执行的迁移列表
+	for _, migration := range migrations {
+		//判断是否已经执行了迁移
+		var installedMigration bool
+		for _, migrationLog := range installedMigrationLogs {
+			if migrationLog.Name == migration.Name() {
+				installedMigration = true
+				break
+			}
+		}
+		//已经执行过了
+		if installedMigration {
+			continue
+		}
+		//处理执行出错
+		if err := migration.Up(); err != nil {
+			return migrationLogs, errors.New("execute " + migration.Name() + " error: " + err.Error())
+		}
+		//构造迁移记录
+		currentMigrationLog := &installedMigrationLog{
+			Name:  migration.Name(),
+			Batch: migrationBatch,
+		}
+		migrationLogs = append(migrationLogs, currentMigrationLog)
+		//step限制
+		if step > 0 && len(migrationLogs) >= step {
+			break
+		}
+	}
+	return migrationLogs, nil
 }
