@@ -13,15 +13,18 @@ import (
 const migrationLogCollectionName = "migrations"
 
 //已安装的数据迁移记录
-type installedMigrationLog struct {
+type migrationLog struct {
 	Id    int    `bson:"id"`    //迁移的ID
 	Name  string `bson:"name"`  //迁移名称
 	Batch int    `bson:"batch"` //迁移的批次
 }
 
+//在执行迁移或者回滚后执行的回调函数
+type migrationHandlerFunc func(name string) error
+
 //获取已安装的数据迁移记录
 //`sortType` 排序方式, 1正序 -1倒序
-func getInstalledMigrationLogs(sortType int) ([]*installedMigrationLog, error) {
+func getInstalledMigrationLogs(sortType int) ([]*migrationLog, error) {
 	database, err := db.Database()
 	if err != nil {
 		return nil, err
@@ -51,21 +54,21 @@ func getInstalledMigrationLogs(sortType int) ([]*installedMigrationLog, error) {
 	if err != nil {
 		return nil, err
 	}
-	var migrationLogs []*installedMigrationLog
+	var migrationLogs []*migrationLog
 	if err = cursor.All(context.TODO(), &migrationLogs); err != nil {
 		return nil, err
 	}
 	return migrationLogs, nil
 }
 
-//创建迁移记录集合
+//创建迁移记录Collection
 func createMigrationLogCollection(database *mongo.Database, collectionFullName string) error {
 	opts := options.CreateCollection()
 	if err := database.CreateCollection(context.TODO(), collectionFullName, opts); err != nil {
 		return err
 	}
 	//创建索引
-	coll := database.Collection(migrationLogCollectionName)
+	coll := database.Collection(collectionFullName)
 	indexView := coll.Indexes()
 	indexModels := []mongo.IndexModel{
 		{

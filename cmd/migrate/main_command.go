@@ -1,9 +1,10 @@
 package migrate
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/liuguangw/forumx/core"
+	"github.com/liuguangw/forumx/core/db"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,16 +16,7 @@ func MainCommand() *cli.Command {
 		Flags: []cli.Flag{
 			&cli.IntFlag{Name: "step", Usage: "Force the migrations to be run so they can be rolled back individually"},
 		},
-		Action: func(c *cli.Context) error {
-			step := c.Int("step")
-			fmt.Println("migrate: ", step)
-			migrationLogs, err := getInstalledMigrationLogs(1)
-			if err != nil {
-				return err
-			}
-			fmt.Println(migrationLogs)
-			return nil
-		},
+		Action: mainCommandAction,
 		Subcommands: []*cli.Command{
 			rollbackCommand(),
 			resetCommand(),
@@ -34,16 +26,57 @@ func MainCommand() *cli.Command {
 	return versionCmd
 }
 
-//处理迁移,返回执行的迁移记录列表
-func processMigrate(installedMigrationLogs []*installedMigrationLog, migrations []core.Migration, step int) ([]*installedMigrationLog, error) {
-	//本次迁移的记录
-	var migrationLogs []*installedMigrationLog
-	//迁移的批次
-	migrationBatch := 1
-	if len(installedMigrationLogs) > 0 {
-		lastInstalledMigrationLog := installedMigrationLogs[len(installedMigrationLogs)-1]
-		migrationBatch = lastInstalledMigrationLog.Batch + 1
+func mainCommandAction(c *cli.Context) error {
+	step := c.Int("step")
+	migrationLogs, err := getInstalledMigrationLogs(1)
+	if err != nil {
+		return err
 	}
+	migrationLogsCount := len(migrationLogs)
+	//下次迁移的ID和批次序号
+	var (
+		nextBatch          = 1
+		nextMigrationLogId = 1
+	)
+	if migrationLogsCount > 0 {
+		lastMigrationLog := migrationLogs[migrationLogsCount-1]
+		nextBatch = lastMigrationLog.Batch + 1
+		nextMigrationLogId = lastMigrationLog.Id + 1
+	}
+	//获取migration记录集合的handle
+	migrationColl, err := db.Collection(migrationLogCollectionName)
+	if err != nil {
+		return err
+	}
+	//迁移执行成功后的操作
+	migrationHandler := func(name string) error {
+		//记录迁移
+		currentMigrationLog := &migrationLog{
+			Id:    nextMigrationLogId,
+			Name:  name,
+			Batch: nextBatch,
+		}
+		//插入迁移记录
+		if _, err := migrationColl.InsertOne(context.TODO(), currentMigrationLog); err != nil {
+			return errors.New("migrate " + name + " error: save migration log error, " + err.Error())
+		}
+		nextMigrationLogId++
+		fmt.Println("migrate " + name + " success")
+		return nil
+	}
+	migrations := allMigrations()
+	if err := processMigrate(migrationLogs, migrations, migrationHandler, step); err != nil {
+		return err
+	}
+	fmt.Println("migrate all success")
+	return nil
+}
+
+//处理数据迁移
+func processMigrate(installedMigrationLogs []*migrationLog, migrations []Migration,
+	migrationHandler migrationHandlerFunc, step int) error {
+	//本次迁移的条数
+	migratedCount := 0
 	//遍历需要执行的迁移列表
 	for _, migration := range migrations {
 		//判断是否已经执行了迁移
@@ -60,18 +93,17 @@ func processMigrate(installedMigrationLogs []*installedMigrationLog, migrations 
 		}
 		//处理执行出错
 		if err := migration.Up(); err != nil {
-			return migrationLogs, errors.New("execute " + migration.Name() + " error: " + err.Error())
+			return errors.New("migrate " + migration.Name() + " error: " + err.Error())
 		}
-		//构造迁移记录
-		currentMigrationLog := &installedMigrationLog{
-			Name:  migration.Name(),
-			Batch: migrationBatch,
+		//执行成功后的处理
+		if err := migrationHandler(migration.Name()); err != nil {
+			return err
 		}
-		migrationLogs = append(migrationLogs, currentMigrationLog)
 		//step限制
-		if step > 0 && len(migrationLogs) >= step {
+		migratedCount++
+		if step > 0 && migratedCount >= step {
 			break
 		}
 	}
-	return migrationLogs, nil
+	return nil
 }

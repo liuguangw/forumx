@@ -1,4 +1,4 @@
-package core
+package migrate
 
 //数据迁移接口定义
 type Migration interface {
