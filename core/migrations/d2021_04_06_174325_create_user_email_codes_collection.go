@@ -40,8 +40,8 @@ func (c *CreateUserEmailCodesCollection) Up() error {
 	indexModels := []mongo.IndexModel{
 		{
 			Keys: bson.D{
-				{"code_type", 1},
-				{"code", 1},
+				{Key: "code_type", Value: 1},
+				{Key: "code", Value: 1},
 			},
 			Options: options.Index().SetName("code_uni").SetUnique(true),
 		},
