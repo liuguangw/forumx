@@ -38,21 +38,23 @@ func TestProcessMigrate(t *testing.T) {
 		migratedNames = append(migratedNames, name)
 		return nil
 	}
-	err := processMigrate(installedMigrationLogs, migrationList, migrationHandler, 0)
+	migrateCount, err := processMigrate(installedMigrationLogs, migrationList, migrationHandler, 0)
 	assertTool.Nil(err)
 	migrationNames := []string{
 		"a1", "a2", "a3", "a4", "a5",
 	}
+	assertTool.Equal(len(migratedNames), migrateCount)
 	for i, migratedName := range migratedNames {
 		assertTool.Equal(migrationNames[i], migratedName)
 	}
 	//step限制
 	migratedNames = nil
-	err = processMigrate(installedMigrationLogs, migrationList, migrationHandler, 2)
+	migrateCount, err = processMigrate(installedMigrationLogs, migrationList, migrationHandler, 2)
 	assertTool.Nil(err)
 	migrationNames = []string{
 		"a1", "a2",
 	}
+	assertTool.Equal(len(migratedNames), migrateCount)
 	for i, migratedName := range migratedNames {
 		assertTool.Equal(migrationNames[i], migratedName)
 	}
@@ -68,11 +70,12 @@ func TestProcessMigrate(t *testing.T) {
 		},
 	}
 	migratedNames = nil
-	err = processMigrate(installedMigrationLogs, migrationList, migrationHandler, 2)
+	migrateCount, err = processMigrate(installedMigrationLogs, migrationList, migrationHandler, 2)
 	assertTool.Nil(err)
 	migrationNames = []string{
 		"a3", "a4",
 	}
+	assertTool.Equal(len(migratedNames), migrateCount)
 	for i, migratedName := range migratedNames {
 		assertTool.Equal(migrationNames[i], migratedName)
 	}
@@ -88,11 +91,12 @@ func TestProcessMigrate(t *testing.T) {
 		},
 	}
 	migratedNames = nil
-	err = processMigrate(installedMigrationLogs, migrationList, migrationHandler, 2)
+	migrateCount, err = processMigrate(installedMigrationLogs, migrationList, migrationHandler, 2)
 	assertTool.Nil(err)
 	migrationNames = []string{
 		"a2", "a4",
 	}
+	assertTool.Equal(len(migratedNames), migrateCount)
 	for i, migratedName := range migratedNames {
 		assertTool.Equal(migrationNames[i], migratedName)
 	}

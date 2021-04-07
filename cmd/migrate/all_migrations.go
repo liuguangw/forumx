@@ -7,7 +7,7 @@ func allMigrations() []Migration {
 	migrationList := []Migration{
 		new(migrations.CreateCountersCollection),
 		new(migrations.CreateUsersCollection),
-		new(migrations.CreateUserEmailCodesCollection),
+		new(migrations.CreateUserEmailLinksCollection),
 	}
 	return migrationList
 }

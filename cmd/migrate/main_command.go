@@ -16,7 +16,10 @@ func MainCommand() *cli.Command {
 		Flags: []cli.Flag{
 			&cli.IntFlag{Name: "step", Usage: "Force the migrations to be run so they can be rolled back individually"},
 		},
-		Action: mainCommandAction,
+		Action: func(c *cli.Context) error {
+			step := c.Int("step")
+			return mainCommandAction(step)
+		},
 		Subcommands: []*cli.Command{
 			rollbackCommand(),
 			resetCommand(),
@@ -26,8 +29,7 @@ func MainCommand() *cli.Command {
 	return versionCmd
 }
 
-func mainCommandAction(c *cli.Context) error {
-	step := c.Int("step")
+func mainCommandAction(step int) error {
 	migrationLogs, err := getInstalledMigrationLogs(1)
 	if err != nil {
 		return err
@@ -65,16 +67,21 @@ func mainCommandAction(c *cli.Context) error {
 		return nil
 	}
 	migrations := allMigrations()
-	if err := processMigrate(migrationLogs, migrations, migrationHandler, step); err != nil {
+	migrateCount, err := processMigrate(migrationLogs, migrations, migrationHandler, step)
+	if err != nil {
 		return err
 	}
-	fmt.Println("migrate all success")
+	if migrateCount == 0 {
+		fmt.Println("nothing to migrate")
+	} else {
+		fmt.Println("migrate success: ", migrateCount, " logs")
+	}
 	return nil
 }
 
-//处理数据迁移
+//处理数据迁移,返回迁移执行的条数
 func processMigrate(installedMigrationLogs []*migrationLog, migrations []Migration,
-	migrationHandler migrationHandlerFunc, step int) error {
+	migrationHandler migrationHandlerFunc, step int) (int, error) {
 	//本次迁移的条数
 	migratedCount := 0
 	//遍历需要执行的迁移列表
@@ -93,11 +100,11 @@ func processMigrate(installedMigrationLogs []*migrationLog, migrations []Migrati
 		}
 		//处理执行出错
 		if err := migration.Up(); err != nil {
-			return errors.New("migrate " + migration.Name() + " error: " + err.Error())
+			return migratedCount, errors.New("migrate " + migration.Name() + " error: " + err.Error())
 		}
 		//执行成功后的处理
 		if err := migrationHandler(migration.Name()); err != nil {
-			return err
+			return migratedCount, err
 		}
 		//step限制
 		migratedCount++
@@ -105,5 +112,5 @@ func processMigrate(installedMigrationLogs []*migrationLog, migrations []Migrati
 			break
 		}
 	}
-	return nil
+	return migratedCount, nil
 }

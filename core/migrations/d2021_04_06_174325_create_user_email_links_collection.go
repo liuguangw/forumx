@@ -9,21 +9,21 @@ import (
 	"time"
 )
 
-//创建user_email_codes集合
-type CreateUserEmailCodesCollection struct {
+//创建user_email_links集合
+type CreateUserEmailLinksCollection struct {
 }
 
-func (*CreateUserEmailCodesCollection) collectionName() string {
-	return db.CollectionFullName("user_email_codes")
+func (*CreateUserEmailLinksCollection) collectionName() string {
+	return db.CollectionFullName("user_email_links")
 }
 
 //迁移的名称
-func (*CreateUserEmailCodesCollection) Name() string {
-	return "d2021_04_06_174325_create_user_email_codes_collection"
+func (*CreateUserEmailLinksCollection) Name() string {
+	return "d2021_04_06_174325_create_user_email_links_collection"
 }
 
 //执行迁移
-func (c *CreateUserEmailCodesCollection) Up() error {
+func (c *CreateUserEmailLinksCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
 		return err
@@ -40,10 +40,10 @@ func (c *CreateUserEmailCodesCollection) Up() error {
 	indexModels := []mongo.IndexModel{
 		{
 			Keys: bson.D{
-				{Key: "code_type", Value: 1},
+				{Key: "link_type", Value: 1},
 				{Key: "code", Value: 1},
 			},
-			Options: options.Index().SetName("code_uni").SetUnique(true),
+			Options: options.Index().SetName("link_code_uni").SetUnique(true),
 		},
 		{
 			Keys: bson.M{
@@ -61,7 +61,7 @@ func (c *CreateUserEmailCodesCollection) Up() error {
 }
 
 //回滚迁移
-func (c *CreateUserEmailCodesCollection) Down() error {
+func (c *CreateUserEmailLinksCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {
 		return err
