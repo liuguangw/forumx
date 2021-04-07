@@ -2,11 +2,10 @@ package db
 
 import (
 	"context"
-	"errors"
+	"github.com/liuguangw/forumx/core/environment"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"os"
 	"time"
 )
 
@@ -17,10 +16,7 @@ func Client() (*mongo.Client, error) {
 	if mongoClient != nil {
 		return mongoClient, nil
 	}
-	dbUri := os.Getenv(dbUriEnvKey)
-	if dbUri == "" {
-		return nil, errors.New(dbUriEnvKey + " environment variable not found")
-	}
+	dbUri := environment.DatabaseUri()
 	//connect
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

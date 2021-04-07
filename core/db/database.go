@@ -1,17 +1,13 @@
 package db
 
 import (
-	"errors"
+	"github.com/liuguangw/forumx/core/environment"
 	"go.mongodb.org/mongo-driver/mongo"
-	"os"
 )
 
 //获取数据库Handle
 func Database() (*mongo.Database, error) {
-	dbName := os.Getenv(dbNameEnvKey)
-	if dbName == "" {
-		return nil, errors.New(dbNameEnvKey + " environment variable not found")
-	}
+	dbName := environment.DatabaseName()
 	client, err := Client()
 	if err != nil {
 		return nil, err
