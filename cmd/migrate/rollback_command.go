@@ -11,7 +11,7 @@ import (
 
 //回滚数据迁移的命令
 func rollbackCommand() *cli.Command {
-	versionCmd := &cli.Command{
+	rollbackCmd := &cli.Command{
 		Name:  "rollback",
 		Usage: "Roll back the database migrations",
 		Flags: []cli.Flag{
@@ -22,7 +22,7 @@ func rollbackCommand() *cli.Command {
 			return rollbackCommandAction(step)
 		},
 	}
-	return versionCmd
+	return rollbackCmd
 }
 
 func rollbackCommandAction(step int) error {
@@ -65,7 +65,7 @@ func processRollback(installedMigrationLogs []*migrationLog, migrations []Migrat
 	lastMigrationLog := installedMigrationLogs[0]
 	//本次回滚的批次
 	rollbackBatch := lastMigrationLog.Batch
-	//本次迁移的条数
+	//本次回滚的条数
 	rollbackCount := 0
 	//遍历迁移记录列表
 	for _, migrationLog := range installedMigrationLogs {

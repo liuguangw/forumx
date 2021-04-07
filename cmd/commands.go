@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/liuguangw/forumx/cmd/migrate"
 	"github.com/urfave/cli/v2"
 )
@@ -18,6 +19,10 @@ func prepareMainApp() *cli.App {
 }
 
 func Execute(args []string) error {
+	//加载.env环境变量配置
+	if err := godotenv.Load(); err != nil {
+		return err
+	}
 	mainApp := prepareMainApp()
 	return mainApp.Run(args)
 }

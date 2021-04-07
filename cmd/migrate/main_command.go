@@ -10,7 +10,7 @@ import (
 
 //执行数据迁移的主命令
 func MainCommand() *cli.Command {
-	versionCmd := &cli.Command{
+	migrateCmd := &cli.Command{
 		Name:  "migrate",
 		Usage: "Run the database migrations",
 		Flags: []cli.Flag{
@@ -26,7 +26,7 @@ func MainCommand() *cli.Command {
 			refreshCommand(),
 		},
 	}
-	return versionCmd
+	return migrateCmd
 }
 
 func mainCommandAction(step int) error {
