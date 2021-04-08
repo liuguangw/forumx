@@ -9,21 +9,21 @@ import (
 	"time"
 )
 
-//创建user_email_links集合
-type CreateUserEmailLinksCollection struct {
+//创建user_mobiles集合
+type CreateUserMobilesCollection struct {
 }
 
-func (*CreateUserEmailLinksCollection) collectionName() string {
-	return db.CollectionFullName("user_email_links")
+func (*CreateUserMobilesCollection) collectionName() string {
+	return db.CollectionFullName("user_mobiles")
 }
 
 //迁移的名称
-func (*CreateUserEmailLinksCollection) Name() string {
-	return "d2021_04_06_174325_create_user_email_links_collection"
+func (*CreateUserMobilesCollection) Name() string {
+	return "d2021_04_08_150821_create_user_mobiles_collection"
 }
 
 //执行迁移
-func (c *CreateUserEmailLinksCollection) Up() error {
+func (c *CreateUserMobilesCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
 		return err
@@ -39,24 +39,16 @@ func (c *CreateUserEmailLinksCollection) Up() error {
 	indexView := coll.Indexes()
 	indexModels := []mongo.IndexModel{
 		{
-			Keys: bson.D{
-				{Key: "link_type", Value: 1},
-				{Key: "code", Value: 1},
+			Keys: bson.M{
+				"mobile": 1,
 			},
-			Options: options.Index().SetName("link_code_uni").SetUnique(true),
+			Options: options.Index().SetName("mobile_uni").SetUnique(true),
 		},
 		{
 			Keys: bson.M{
-				"email": 1,
+				"user_id": 1,
 			},
-			Options: options.Index().SetName("email_index"),
-		},
-		{
-			Keys: bson.M{
-				"created_at": 1,
-			},
-			//15分钟后自动失效
-			Options: options.Index().SetName("created_at_ttl").SetExpireAfterSeconds(900),
+			Options: options.Index().SetName("user_id_index"),
 		},
 	}
 	indexOpts := options.CreateIndexes().SetMaxTime(2 * time.Second)
@@ -67,7 +59,7 @@ func (c *CreateUserEmailLinksCollection) Up() error {
 }
 
 //回滚迁移
-func (c *CreateUserEmailLinksCollection) Down() error {
+func (c *CreateUserMobilesCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {
 		return err

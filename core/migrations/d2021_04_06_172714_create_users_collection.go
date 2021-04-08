@@ -52,9 +52,15 @@ func (c *CreateUsersCollection) Up() error {
 		},
 		{
 			Keys: bson.M{
-				"email": 1,
+				"coin_amount": -1,
 			},
-			Options: options.Index().SetName("email_uni").SetUnique(true),
+			Options: options.Index().SetName("coin_amount_index"),
+		},
+		{
+			Keys: bson.M{
+				"exp_amount": -1,
+			},
+			Options: options.Index().SetName("exp_amount_index"),
 		},
 	}
 	indexOpts := options.CreateIndexes().SetMaxTime(2 * time.Second)

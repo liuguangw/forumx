@@ -12,6 +12,7 @@ func prepareMainApp() *cli.App {
 		Name:        "forumx",
 		Description: "forumx is an efficient forum service API",
 		Commands: []*cli.Command{
+			serveCommand(),
 			versionCommand(),
 			migrate.MainCommand(),
 		},

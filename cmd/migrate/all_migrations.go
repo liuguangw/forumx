@@ -8,6 +8,10 @@ func allMigrations() []Migration {
 		new(migrations.CreateCountersCollection),
 		new(migrations.CreateUsersCollection),
 		new(migrations.CreateUserEmailLinksCollection),
+		new(migrations.CreateUsersEmailsCollection),
+		new(migrations.CreateUserMobileCodesCollection),
+		new(migrations.CreateUserMobilesCollection),
+		new(migrations.InitCountersCollection),
 	}
 	return migrationList
 }

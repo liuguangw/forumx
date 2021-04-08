@@ -7,9 +7,9 @@ type User struct {
 	Id             int64     `bson:"id"`              //用户ID
 	Username       string    `bson:"username"`        //用户名
 	Nickname       string    `bson:"nickname"`        //昵称
+	AvatarUrl      string    `bson:"avatar_url"`      //头像
 	CoinAmount     int64     `bson:"coin_amount"`     //金币余额
 	ExpAmount      int64     `bson:"exp_amount"`      //经验值
-	Email          string    `bson:"email"`           //email地址
 	EmailVerified  bool      `bson:"email_verified"`  //email是否已验证
 	MobileVerified bool      `bson:"mobile_verified"` //手机号是否已验证
 	Password       string    `bson:"password"`        //密码
