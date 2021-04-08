@@ -30,6 +30,7 @@ func loadEnvFile() error {
 	return godotenv.Load()
 }
 
+//Execute 执行命令行的入口
 func Execute(args []string) error {
 	//加载环境变量文件
 	if err := loadEnvFile(); err != nil {

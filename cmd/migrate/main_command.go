@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-//执行数据迁移的主命令
+//MainCommand 执行数据迁移的主命令
 func MainCommand() *cli.Command {
 	migrateCmd := &cli.Command{
 		Name:  "migrate",
@@ -38,12 +38,12 @@ func mainCommandAction(step int) error {
 	//下次迁移的ID和批次序号
 	var (
 		nextBatch          = 1
-		nextMigrationLogId = 1
+		nextMigrationLogID = 1
 	)
 	if migrationLogsCount > 0 {
 		lastMigrationLog := migrationLogs[migrationLogsCount-1]
 		nextBatch = lastMigrationLog.Batch + 1
-		nextMigrationLogId = lastMigrationLog.Id + 1
+		nextMigrationLogID = lastMigrationLog.ID + 1
 	}
 	//获取migration记录集合的handle
 	migrationColl, err := db.Collection(migrationLogCollectionName)
@@ -54,7 +54,7 @@ func mainCommandAction(step int) error {
 	migrationHandler := func(name string) error {
 		//记录迁移
 		currentMigrationLog := &migrationLog{
-			Id:    nextMigrationLogId,
+			ID:    nextMigrationLogID,
 			Name:  name,
 			Batch: nextBatch,
 		}
@@ -62,7 +62,7 @@ func mainCommandAction(step int) error {
 		if _, err := migrationColl.InsertOne(context.TODO(), currentMigrationLog); err != nil {
 			return errors.New("migrate " + name + " error: save migration log error, " + err.Error())
 		}
-		nextMigrationLogId++
+		nextMigrationLogID++
 		fmt.Println("migrate " + name + " success")
 		return nil
 	}

@@ -24,27 +24,27 @@ func TestProcessRollback(t *testing.T) {
 	}
 	installedMigrationLogs = []*migrationLog{
 		{
-			Id:    5,
+			ID:    5,
 			Name:  "a5",
 			Batch: 3,
 		},
 		{
-			Id:    4,
+			ID:    4,
 			Name:  "a4",
 			Batch: 3,
 		},
 		{
-			Id:    3,
+			ID:    3,
 			Name:  "a3",
 			Batch: 2,
 		},
 		{
-			Id:    2,
+			ID:    2,
 			Name:  "a2",
 			Batch: 2,
 		},
 		{
-			Id:    1,
+			ID:    1,
 			Name:  "a1",
 			Batch: 1,
 		},

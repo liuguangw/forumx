@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//创建user_email_links集合
+//CreateUserEmailLinksCollection 创建绑定邮箱、重置密码的邮件链接记录集合
 type CreateUserEmailLinksCollection struct {
 }
 
@@ -17,12 +17,12 @@ func (*CreateUserEmailLinksCollection) collectionName() string {
 	return db.CollectionFullName("user_email_links")
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*CreateUserEmailLinksCollection) Name() string {
 	return "d2021_04_06_174325_create_user_email_links_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *CreateUserEmailLinksCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *CreateUserEmailLinksCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *CreateUserEmailLinksCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {

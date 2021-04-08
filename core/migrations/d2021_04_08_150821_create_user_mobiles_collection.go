@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//创建user_mobiles集合
+//CreateUserMobilesCollection 创建手机绑定记录集合
 type CreateUserMobilesCollection struct {
 }
 
@@ -17,12 +17,12 @@ func (*CreateUserMobilesCollection) collectionName() string {
 	return db.CollectionFullName("user_mobiles")
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*CreateUserMobilesCollection) Name() string {
 	return "d2021_04_08_150821_create_user_mobiles_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *CreateUserMobilesCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
@@ -58,7 +58,7 @@ func (c *CreateUserMobilesCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *CreateUserMobilesCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {

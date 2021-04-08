@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//初始化计数器
+//InitCountersCollection 初始化计数器
 type InitCountersCollection struct {
 }
 
@@ -21,12 +21,12 @@ func (*InitCountersCollection) collection() (*mongo.Collection, error) {
 	return counterColl, nil
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*InitCountersCollection) Name() string {
 	return "d2021_04_08_152902_init_counters_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *InitCountersCollection) Up() error {
 	counterColl, err := c.collection()
 	if err != nil {
@@ -35,7 +35,7 @@ func (c *InitCountersCollection) Up() error {
 	itemList := []interface{}{
 		&models.Counter{
 			CounterKey:   "user.next_id",
-			CounterValue: environment.FounderUserId(),
+			CounterValue: environment.FounderUserID(),
 		},
 		&models.Counter{
 			CounterKey:   "forum.next_id",
@@ -56,7 +56,7 @@ func (c *InitCountersCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *InitCountersCollection) Down() error {
 	counterColl, err := c.collection()
 	if err != nil {

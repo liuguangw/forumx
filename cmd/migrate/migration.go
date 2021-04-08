@@ -1,6 +1,6 @@
 package migrate
 
-//数据迁移接口定义
+//Migration 数据迁移接口定义
 type Migration interface {
 	//迁移的名称
 	Name() string

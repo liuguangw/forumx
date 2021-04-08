@@ -14,7 +14,7 @@ const migrationLogCollectionName = "migrations"
 
 //已安装的数据迁移记录
 type migrationLog struct {
-	Id    int    `bson:"id"`    //迁移的ID
+	ID    int    `bson:"id"`    //迁移的ID
 	Name  string `bson:"name"`  //迁移名称
 	Batch int    `bson:"batch"` //迁移的批次
 }

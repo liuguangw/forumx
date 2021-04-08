@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//创建user_emails集合
+//CreateUsersEmailsCollection 创建用户绑定的邮箱记录集合
 type CreateUsersEmailsCollection struct {
 }
 
@@ -17,12 +17,12 @@ func (*CreateUsersEmailsCollection) collectionName() string {
 	return db.CollectionFullName("user_emails")
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*CreateUsersEmailsCollection) Name() string {
 	return "d2021_04_08_145219_create_user_emails_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *CreateUsersEmailsCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
@@ -58,7 +58,7 @@ func (c *CreateUsersEmailsCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *CreateUsersEmailsCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {

@@ -11,16 +11,16 @@ import (
 
 var mongoClient *mongo.Client
 
-//获取数据库Client
+//Client 获取MongoDB数据库Client对象指针
 func Client() (*mongo.Client, error) {
 	if mongoClient != nil {
 		return mongoClient, nil
 	}
-	dbUri := environment.DatabaseUri()
+	dbURI := environment.DatabaseURI()
 	//connect
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbURI))
 	if err != nil {
 		return nil, err
 	}

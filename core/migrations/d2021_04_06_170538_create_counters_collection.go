@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//创建counters集合
+//CreateCountersCollection 创建计数器集合
 type CreateCountersCollection struct {
 }
 
@@ -17,12 +17,12 @@ func (*CreateCountersCollection) collectionName() string {
 	return db.CollectionFullName("counters")
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*CreateCountersCollection) Name() string {
 	return "d2021_04_06_170538_create_counters_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *CreateCountersCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
@@ -52,7 +52,7 @@ func (c *CreateCountersCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *CreateCountersCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {

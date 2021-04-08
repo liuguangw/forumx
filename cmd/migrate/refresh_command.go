@@ -50,13 +50,13 @@ func refreshCommandAction() error {
 	//下次迁移的ID和批次序号
 	var (
 		nextBatch          = 1
-		nextMigrationLogId = 1
+		nextMigrationLogID = 1
 	)
 	//迁移执行成功后的操作
 	migrationHandler := func(name string) error {
 		//记录迁移
 		currentMigrationLog := &migrationLog{
-			Id:    nextMigrationLogId,
+			ID:    nextMigrationLogID,
 			Name:  name,
 			Batch: nextBatch,
 		}
@@ -64,7 +64,7 @@ func refreshCommandAction() error {
 		if _, err := migrationColl.InsertOne(context.TODO(), currentMigrationLog); err != nil {
 			return errors.New("migrate " + name + " error: save migration log error, " + err.Error())
 		}
-		nextMigrationLogId++
+		nextMigrationLogID++
 		fmt.Println("migrate " + name + " success")
 		return nil
 	}

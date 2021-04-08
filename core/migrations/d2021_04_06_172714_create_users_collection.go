@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//创建users集合
+//CreateUsersCollection 创建用户集合
 type CreateUsersCollection struct {
 }
 
@@ -17,12 +17,12 @@ func (*CreateUsersCollection) collectionName() string {
 	return db.CollectionFullName("users")
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*CreateUsersCollection) Name() string {
 	return "d2021_04_06_172714_create_users_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *CreateUsersCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
@@ -70,7 +70,7 @@ func (c *CreateUsersCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *CreateUsersCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {

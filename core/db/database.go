@@ -5,7 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//获取数据库Handle
+//Database 获取数据库Handle
 func Database() (*mongo.Database, error) {
 	dbName := environment.DatabaseName()
 	client, err := Client()

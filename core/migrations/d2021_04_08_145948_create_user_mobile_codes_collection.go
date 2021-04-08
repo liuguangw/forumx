@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//创建user_mobile_codes集合
+//CreateUserMobileCodesCollection 创建短信验证码集合
 type CreateUserMobileCodesCollection struct {
 }
 
@@ -17,12 +17,12 @@ func (*CreateUserMobileCodesCollection) collectionName() string {
 	return db.CollectionFullName("user_mobile_codes")
 }
 
-//迁移的名称
+//Name 迁移的名称
 func (*CreateUserMobileCodesCollection) Name() string {
 	return "d2021_04_08_145948_create_user_mobile_codes_collection"
 }
 
-//执行迁移
+//Up 执行迁移
 func (c *CreateUserMobileCodesCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
@@ -61,7 +61,7 @@ func (c *CreateUserMobileCodesCollection) Up() error {
 	return nil
 }
 
-//回滚迁移
+//Down 回滚迁移
 func (c *CreateUserMobileCodesCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {
