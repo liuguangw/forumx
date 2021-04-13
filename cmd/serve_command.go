@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"github.com/gofiber/fiber/v2"
-	recover2 "github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/liuguangw/forumx/core/middlewares"
+	"github.com/liuguangw/forumx/routes"
 	"github.com/urfave/cli/v2"
 	"strconv"
 )
 
-//展示版本信息的命令
+//处理HTTP服务
 func serveCommand() *cli.Command {
 	serveCmd := &cli.Command{
 		Name:  "serve",
@@ -17,15 +18,10 @@ func serveCommand() *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			app := fiber.New()
-			app.Use(recover2.New(recover2.Config{
-				EnableStackTrace: true,
-			}))
-			app.Get("/", func(c *fiber.Ctx) error {
-				return c.SendString("Hello, World 👋!")
-			})
-			app.Get("/panic", func(c *fiber.Ctx) error {
-				panic("normally this would crash your app")
-			})
+			app.Use(middlewares.RecoverHandle())
+			//加载api路由
+			routes.LoadAPIRoutes(app)
+			//端口
 			port := c.Int("port")
 			return app.Listen(":" + strconv.Itoa(port))
 		},
