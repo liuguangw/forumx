@@ -26,7 +26,7 @@ func usernameExists(username string) (bool, error) {
 }
 
 //RegisterUser 处理用户注册
-func RegisterUser(username, nickname, email, password string) (*models.User, *common.AppError) {
+func RegisterUser(username, nickname, email, password, clientIP string) (*models.User, *common.AppError) {
 	//判断用户名是否已存在
 	userExists, err := usernameExists(username)
 	if err != nil {
@@ -48,12 +48,13 @@ func RegisterUser(username, nickname, email, password string) (*models.User, *co
 	salt := generateRandomString(8)
 	encodedPassword := hashPassword(password, salt)
 	userInfo := &models.User{
-		Username:  username,
-		Nickname:  nickname,
-		Password:  encodedPassword,
-		Salt:      salt,
-		CreatedAt: timeNow,
-		UpdatedAt: timeNow,
+		Username:   username,
+		Nickname:   nickname,
+		Password:   encodedPassword,
+		Salt:       salt,
+		RegisterIP: clientIP,
+		CreatedAt:  timeNow,
+		UpdatedAt:  timeNow,
 	}
 	//使用事务
 	client, err := db.Client()

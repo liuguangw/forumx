@@ -19,4 +19,5 @@ type UserMobileCode struct {
 	CodeUsed  bool      `bson:"code_used"`  //是否已使用
 	CreatedAt time.Time `bson:"created_at"` //创建时间
 	UpdatedAt time.Time `bson:"updated_at"` //最后更新时间
+	ExpiredAt time.Time `bson:"expired_at"` //过期时间
 }

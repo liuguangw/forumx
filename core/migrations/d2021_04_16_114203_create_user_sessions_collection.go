@@ -9,21 +9,21 @@ import (
 	"time"
 )
 
-//CreateUserMobileCodesCollection 创建短信验证码集合
-type CreateUserMobileCodesCollection struct {
+//CreateUserSessionsCollection 创建用户会话集合
+type CreateUserSessionsCollection struct {
 }
 
-func (*CreateUserMobileCodesCollection) collectionName() string {
-	return db.CollectionFullName("user_mobile_codes")
+func (*CreateUserSessionsCollection) collectionName() string {
+	return db.CollectionFullName("user_sessions")
 }
 
 //Name 迁移的名称
-func (*CreateUserMobileCodesCollection) Name() string {
-	return "d2021_04_08_145948_create_user_mobile_codes_collection"
+func (*CreateUserSessionsCollection) Name() string {
+	return "d2021_04_16_114203_create_user_sessions_collection"
 }
 
 //Up 执行迁移
-func (c *CreateUserMobileCodesCollection) Up() error {
+func (c *CreateUserSessionsCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
 		return err
@@ -39,17 +39,22 @@ func (c *CreateUserMobileCodesCollection) Up() error {
 	indexView := coll.Indexes()
 	indexModels := []mongo.IndexModel{
 		{
-			Keys: bson.D{
-				{Key: "mobile", Value: 1},
-				{Key: "code_type", Value: 1},
-				{Key: "code", Value: 1},
+			Keys: bson.M{
+				"id": 1,
 			},
-			Options: options.Index().SetName("mobile_code_index"),
+			Options: options.Index().SetName("id_uni").SetUnique(true),
+		},
+		{
+			Keys: bson.M{
+				"user_id": 1,
+			},
+			Options: options.Index().SetName("user_id_index"),
 		},
 		{
 			Keys: bson.M{
 				"expired_at": 1,
 			},
+			//ttl索引
 			Options: options.Index().SetName("expired_at_ttl").SetExpireAfterSeconds(1),
 		},
 	}
@@ -61,7 +66,7 @@ func (c *CreateUserMobileCodesCollection) Up() error {
 }
 
 //Down 回滚迁移
-func (c *CreateUserMobileCodesCollection) Down() error {
+func (c *CreateUserSessionsCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {
 		return err

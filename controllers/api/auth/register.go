@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/request"
 	"github.com/liuguangw/forumx/core/service"
 )
@@ -16,10 +17,23 @@ func Register(c *fiber.Ctx) error {
 	if err := req.CheckRequest(); err != nil {
 		return err.WriteResponse(c)
 	}
-	//todo 检测验证码是否正确
+	//加载session
+	sessionID := service.GetRequestSessionID(c)
+	userSession, err1 := service.GetUserSessionByID(sessionID)
+	if err1 != nil {
+		return service.WriteErrorResponse(c, common.ErrorInternalServer, "读取会话失败")
+	}
+	if userSession == nil {
+		return service.WriteErrorResponse(c, common.ErrorSessionExpired, "会话已失效")
+	}
+	//检测验证码
+	if !service.CheckCaptchaCode(userSession, req.CaptchaCode, true) {
+		return service.WriteErrorResponse(c, common.ErrorInputFieldInvalid, "验证码错误")
+	}
 	//注册账号
+	clientIP := c.IP()
 	user, registerError := service.RegisterUser(req.Username, req.Nickname,
-		req.EmailAddress, req.Password)
+		req.EmailAddress, req.Password, clientIP)
 	if registerError != nil {
 		return registerError.WriteResponse(c)
 	}

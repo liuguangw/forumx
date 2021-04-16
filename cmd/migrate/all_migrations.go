@@ -12,6 +12,7 @@ func allMigrations() []Migration {
 		new(migrations.CreateUserMobileCodesCollection),
 		new(migrations.CreateUserMobilesCollection),
 		new(migrations.InitCountersCollection),
+		new(migrations.CreateUserSessionsCollection),
 	}
 	return migrationList
 }
