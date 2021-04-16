@@ -20,6 +20,6 @@ const (
 	ErrorInternalServer    = 5000 //内部错误
 	ErrorInputFieldIsEmpty = 5001 //所需字段为空
 	ErrorInputFieldInvalid = 5002 //输入的字段值无效
-	ErrorSessionExpired = 5003 //sessionID无效或者已经过期
+	ErrorSessionExpired    = 5003 //sessionID无效或者已经过期
 
 )

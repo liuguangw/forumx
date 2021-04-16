@@ -48,8 +48,8 @@ func SaveUserSession(itemInfo *models.UserSession) error {
 	}
 	ctx, cancel := context.WithTimeout(context.TODO(), 3*time.Second)
 	defer cancel()
-	if _, err := coll.UpdateOne(ctx, filter,bson.M{
-		"$set":itemInfo,
+	if _, err := coll.UpdateOne(ctx, filter, bson.M{
+		"$set": itemInfo,
 	}); err != nil {
 		return err
 	}
