@@ -6,5 +6,9 @@ import "os"
 //若为空,则默认为空字符串
 func CollectionPrefix() string {
 	envKey := "FORUM_COLLECTION_PREFIX"
-	return os.Getenv(envKey)
+	itemValue := os.Getenv(envKey)
+	if itemValue != "" {
+		return itemValue
+	}
+	return "pre_"
 }

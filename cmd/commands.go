@@ -5,6 +5,7 @@ import (
 	"github.com/liuguangw/forumx/cmd/migrate"
 	"github.com/urfave/cli/v2"
 	"os"
+	"path/filepath"
 )
 
 func prepareMainApp() *cli.App {
@@ -22,12 +23,32 @@ func prepareMainApp() *cli.App {
 
 //加载 `.env`文件, 可以使用 `FORUM_ENV_FILENAME` 环境变量设置自定义的文件名
 func loadEnvFile() error {
-	//自定义.env文件名
+	//环境变量配置文件名称
 	envFileName := os.Getenv("FORUM_ENV_FILENAME")
-	if envFileName != "" {
-		return godotenv.Load(envFileName)
+	if envFileName == "" {
+		envFileName = ".env" //默认名称
 	}
-	return godotenv.Load()
+	//获取工作目录
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	envFilePath := filepath.Join(workingDir, envFileName)
+	//如果工作目录下存在环境变量配置文件,则加载配置文件
+	if _, err := os.Stat(envFilePath); os.IsExist(err) {
+		return godotenv.Load(envFilePath)
+	}
+	//使用二进制文件所在目录下的
+	exeFilePath, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	envFilePath = filepath.Join(filepath.Dir(exeFilePath), envFileName)
+	if _, err := os.Stat(envFilePath); os.IsExist(err) {
+		return godotenv.Load(envFilePath)
+	}
+	//如果找不到文件则不加载
+	return nil
 }
 
 //Execute 执行命令行的入口
