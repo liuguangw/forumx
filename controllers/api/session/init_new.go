@@ -7,8 +7,8 @@ import (
 	"github.com/liuguangw/forumx/core/service"
 )
 
-//InitNewSession 初始化Session并返回ID和过期时间给客户端
-func InitNewSession(c *fiber.Ctx) error {
+//InitNew 初始化Session并返回ID和过期时间给客户端
+func InitNew(c *fiber.Ctx) error {
 	sessionData := new(models.UserSession)
 	if err := service.SaveUserSession(sessionData); err != nil {
 		return service.WriteErrorResponse(c, common.ErrorInternalServer, "初始化会话失败")

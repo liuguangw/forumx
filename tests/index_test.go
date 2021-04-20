@@ -14,12 +14,12 @@ func testIndexHello(app *fiber.App, t *testing.T) {
 		"/api/",
 		nil,
 	)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	res, err := app.Test(req, -1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 	// Read the response body
 	body, err := ioutil.ReadAll(res.Body)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "Hello, World 👋!", string(body))
 }

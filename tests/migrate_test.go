@@ -10,5 +10,5 @@ import (
 func testMigrate(t *testing.T) {
 	args := []string{"forumx", "migrate", "refresh"}
 	err := cmd.Execute(args)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }

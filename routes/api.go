@@ -15,7 +15,7 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Get("/", index.Hello)
 	apiGroup.Get("/panic", index.PanicDemo)
 
-	apiGroup.Post("/session/init", session.InitNewSession)
+	apiGroup.Post("/session/init", session.InitNew)
 	apiGroup.Get("/captcha/show", captcha.Show)
 
 	apiGroup.Post("/auth/register", auth.Register)
