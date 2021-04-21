@@ -23,6 +23,5 @@ func testCaptchaShow(app *fiber.App, sessionID string, t *testing.T) string {
 	//获取图形验证码
 	userSession, err := service.GetUserSessionByID(sessionID)
 	assert.NoError(t, err)
-	codeStr := userSession.Data["captcha_code"].(string)
-	return codeStr
+	return userSession.Data["captcha_code"].(string)
 }

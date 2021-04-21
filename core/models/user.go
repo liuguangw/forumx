@@ -12,6 +12,7 @@ type User struct {
 	ExpAmount      int64     `bson:"exp_amount"`      //经验值
 	EmailVerified  bool      `bson:"email_verified"`  //email是否已验证
 	MobileVerified bool      `bson:"mobile_verified"` //手机号是否已验证
+	Enable2FA      bool      `bson:"enable_2fa"`      //是否启用了双重验证
 	Password       string    `bson:"password"`        //密码
 	Salt           string    `bson:"salt"`            //密码salt
 	RegisterIP     string    `bson:"register_ip"`     //注册时的IP地址

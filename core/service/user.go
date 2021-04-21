@@ -106,3 +106,26 @@ func hashPassword(password, salt string) string {
 	saltStr := md5String(salt) + "53f0b847-82f6-43e1-8052-d6ebb97d1e0c"
 	return md5String(password + saltStr)
 }
+
+//VerifyPassword 判断用户输入的密码是否正确
+func VerifyPassword(userInfo *models.User, inputPassword string) bool {
+	return hashPassword(inputPassword, userInfo.Salt) == userInfo.Password
+}
+
+//FindUserByUsername 使用用户名查找用户信息
+func FindUserByUsername(username string) (*models.User, error) {
+	coll, err := db.Collection(userCollectionName)
+	if err != nil {
+		return nil, err
+	}
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	userInfo := new(models.User)
+	if err := coll.FindOne(ctx, bson.M{"username": username}).Decode(userInfo); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return userInfo, nil
+}

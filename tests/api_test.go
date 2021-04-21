@@ -12,17 +12,17 @@ func TestAPI(t *testing.T) {
 	t.Run("index.Hello", func(t *testing.T) {
 		testIndexHello(app, t)
 	})
-	var (
-		sessionID   string
-		captchaCode string
-	)
+	var sessionID string
 	t.Run("session.InitNew", func(t *testing.T) {
 		sessionID = testSessionInitNew(app, t)
 	})
 	t.Run("captcha.Show", func(t *testing.T) {
-		captchaCode = testCaptchaShow(app, sessionID, t)
+		testCaptchaShow(app, sessionID, t)
 	})
 	t.Run("auth.Register", func(t *testing.T) {
-		testAuthRegister(app, sessionID, captchaCode, t)
+		testAuthRegister(app, sessionID, t)
+	})
+	t.Run("auth.Login", func(t *testing.T) {
+		testAuthLogin(app, sessionID, t)
 	})
 }

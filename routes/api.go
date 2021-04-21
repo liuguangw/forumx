@@ -19,4 +19,5 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Get("/captcha/show", captcha.Show)
 
 	apiGroup.Post("/auth/register", auth.Register)
+	apiGroup.Post("/auth/login", auth.Login)
 }
