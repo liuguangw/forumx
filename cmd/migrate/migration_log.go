@@ -3,6 +3,7 @@ package migrate
 import (
 	"context"
 	"github.com/liuguangw/forumx/core/db"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -27,7 +28,7 @@ type migrationHandlerFunc func(name string) error
 func getInstalledMigrationLogs(sortType int) ([]*migrationLog, error) {
 	database, err := db.Database()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Database error")
 	}
 	//判断迁移记录集合是否存在
 	collectionFullName := db.CollectionFullName(migrationLogCollectionName)
@@ -35,28 +36,28 @@ func getInstalledMigrationLogs(sortType int) ([]*migrationLog, error) {
 		"name": collectionFullName,
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "list collection names failed")
 	}
 	//创建集合
 	if len(collectionNames) == 0 {
 		if err := createMigrationLogCollection(database, collectionFullName); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "create collection "+collectionFullName+" failed")
 		}
 	}
 	coll, err := db.Collection(migrationLogCollectionName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "use collection "+migrationLogCollectionName+" failed")
 	}
 	opts := options.Find().SetSort(bson.M{
 		"id": sortType,
 	})
 	cursor, err := coll.Find(context.TODO(), bson.M{}, opts)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "list migration logs failed")
 	}
 	var migrationLogs []*migrationLog
 	if err = cursor.All(context.TODO(), &migrationLogs); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "load migration logs failed")
 	}
 	return migrationLogs, nil
 }

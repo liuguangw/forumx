@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/common"
+	"github.com/liuguangw/forumx/core/service"
 	"os"
 	"runtime"
 )
@@ -16,8 +17,10 @@ func RecoverHandle(c *fiber.Ctx) error {
 			//记录错误信息
 			defaultStackTraceHandler(r)
 			//返回给客户端的响应
-			appError := common.NewAppError(common.ErrorInternalServer, "系统内部错误")
-			_ = appError.WriteResponse(c, 500)
+			_ = service.WriteResponse(c, &common.AppResponse{
+				Code:    common.ErrorInternalServer,
+				Message: "服务器异常",
+			})
 		}
 	}()
 	return c.Next()

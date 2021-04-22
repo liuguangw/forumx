@@ -2,9 +2,9 @@ package migrate
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/liuguangw/forumx/core/db"
+	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 )
 
@@ -60,7 +60,7 @@ func mainCommandAction(step int) error {
 		}
 		//插入迁移记录
 		if _, err := migrationColl.InsertOne(context.TODO(), currentMigrationLog); err != nil {
-			return errors.New("migrate " + name + " error: save migration log error, " + err.Error())
+			return errors.Wrap(err, "migrate "+name+" failed, save migration log error")
 		}
 		nextMigrationLogID++
 		fmt.Println("migrate " + name + " success")
@@ -100,7 +100,7 @@ func processMigrate(installedMigrationLogs []*migrationLog, migrations []Migrati
 		}
 		//处理执行出错
 		if err := migration.Up(); err != nil {
-			return migratedCount, errors.New("migrate " + migration.Name() + " error: " + err.Error())
+			return migratedCount, errors.Wrap(err, "migrate "+migration.Name()+" failed")
 		}
 		//执行成功后的处理
 		if err := migrationHandler(migration.Name()); err != nil {
