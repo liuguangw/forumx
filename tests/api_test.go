@@ -9,6 +9,7 @@ import (
 func TestAPI(t *testing.T) {
 	app := cmd.SetupApp()
 	t.Run("migrate", testMigrate)
+	t.Run("cache", testCache)
 	t.Run("index.Hello", func(t *testing.T) {
 		testIndexHello(app, t)
 	})

@@ -68,8 +68,8 @@ func insertUserSession(itemInfo *models.UserSession) error {
 		sessionIDValid = tmpSessionLog == nil
 	}
 	itemInfo.CreatedAt = itemInfo.UpdatedAt
-	//session生命周期
-	sessionDuration := 15 * 24 * time.Hour
+	//session 默认生命周期
+	sessionDuration := 20 * time.Minute
 	itemInfo.ExpiredAt = time.Now().Add(sessionDuration)
 	coll, err := db.Collection(userSessionCollectionName)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"github.com/liuguangw/forumx/core/request"
 	"github.com/liuguangw/forumx/core/service"
 	"github.com/pkg/errors"
+	"time"
 )
 
 //Login 处理用户登录请求
@@ -59,6 +60,8 @@ func Login(c *fiber.Ctx) error {
 	if userInfo.Enable2FA {
 		userSession.Authed = false
 	}
+	//session生命周期重新设置
+	userSession.ExpiredAt = time.Now().Add(5 * 24 * time.Hour)
 	//保存会话数据
 	if err := service.SaveUserSession(userSession); err != nil {
 		return service.WriteInternalErrorResponse(c, errors.Wrap(err1, "save session "+sessionID+" failed"))

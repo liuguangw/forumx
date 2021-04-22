@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/pkg/errors"
+	"os"
 )
 
 //WriteResponse 返回响应给客户端
@@ -39,6 +40,7 @@ func WriteInternalErrorResponse(c *fiber.Ctx, systemError error) error {
 		Code:    common.ErrorInternalServer,
 		Message: "系统内部错误",
 	}
-	_ = fmt.Errorf("%+v", errors.WithStack(systemError))
+	err := fmt.Errorf("%+v", errors.WithStack(systemError))
+	_, _ = os.Stderr.WriteString(err.Error() + "\n")
 	return WriteResponse(c, &resp)
 }

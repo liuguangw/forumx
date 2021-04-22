@@ -14,6 +14,7 @@ func allMigrations() []Migration {
 		new(migrations.InitCountersCollection),
 		new(migrations.CreateUserSessionsCollection),
 		new(migrations.CreateUserMultiFactoryTokensCollection),
+		new(migrations.CreateCachesCollection),
 	}
 	return migrationList
 }
