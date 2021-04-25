@@ -20,4 +20,5 @@ func LoadAPIRoutes(app *fiber.App) {
 
 	apiGroup.Post("/auth/register", auth.Register)
 	apiGroup.Post("/auth/login", auth.Login)
+	apiGroup.Post("/auth/multi-factory-token", auth.MultiFactoryToken)
 }

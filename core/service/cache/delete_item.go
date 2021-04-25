@@ -4,11 +4,10 @@ import (
 	"context"
 	"github.com/liuguangw/forumx/core/db"
 	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 //DeleteItem 根据键名删除缓存
-func DeleteItem(itemKey string) error {
+func DeleteItem(ctx context.Context, itemKey string) error {
 	coll, err := db.Collection(collectionName)
 	if err != nil {
 		return err
@@ -16,8 +15,9 @@ func DeleteItem(itemKey string) error {
 	filter := bson.M{
 		"item_key": itemKey,
 	}
-	ctx, cancel := context.WithTimeout(context.TODO(), 3*time.Second)
-	defer cancel()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if _, err := coll.DeleteOne(ctx, filter); err != nil {
 		return err
 	}

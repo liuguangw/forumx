@@ -4,12 +4,14 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.38.23 // indirect
+	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/gofiber/fiber/v2 v2.8.0
 	github.com/joho/godotenv v1.3.0
 	github.com/klauspost/compress v1.12.1 // indirect
 	github.com/mojocn/base64Captcha v1.3.4
 	github.com/pkg/errors v0.9.1
+	github.com/pquerna/otp v1.3.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0

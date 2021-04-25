@@ -23,9 +23,7 @@ func CreateImage(ctx context.Context, userSession *models.UserSession) ([]byte, 
 	}
 	//generate code string
 	_, _, captchaCode := captchaDriver.GenerateIdQuestionAnswer()
-	userSession.Data = map[string]interface{}{
-		sessionKey: strings.ToLower(captchaCode),
-	}
+	userSession.Set(sessionKey, strings.ToLower(captchaCode))
 	//save session
 	if ctx == nil {
 		ctx = context.Background()

@@ -10,7 +10,7 @@ import (
 )
 
 //GetItem 从缓存中加载数据,如果缓存存在则为true
-func GetItem(itemKey string, cachedItem interface{}) (bool, error) {
+func GetItem(ctx context.Context, itemKey string, cachedItem interface{}) (bool, error) {
 	coll, err := db.Collection(collectionName)
 	if err != nil {
 		return false, err
@@ -18,8 +18,9 @@ func GetItem(itemKey string, cachedItem interface{}) (bool, error) {
 	filter := bson.M{
 		"item_key": itemKey,
 	}
-	ctx, cancel := context.WithTimeout(context.TODO(), 3*time.Second)
-	defer cancel()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	findResult := coll.FindOne(ctx, filter)
 	if err := findResult.Decode(cachedItem); err != nil {
 		//不存在的key

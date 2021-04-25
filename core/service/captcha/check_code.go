@@ -9,15 +9,14 @@ import (
 
 //CheckCode 检测用户输入的验证码是否正确
 func CheckCode(ctx context.Context, userSession *models.UserSession, inputCaptchaCode string, clear bool) bool {
-	sessionData := userSession.Data
-	if captchaCode, ok := sessionData[sessionKey]; ok {
-		captchaCodeStr := strings.ToLower(captchaCode.(string))
-		result := captchaCodeStr == inputCaptchaCode
-		if clear {
-			delete(sessionData, sessionKey)
-			_ = session.Save(ctx, userSession)
-		}
-		return result
+	captchaCode := userSession.Get(sessionKey)
+	//存储的验证码为空,表示客户端未请求图片
+	if captchaCode == "" {
+		return false
 	}
-	return false
+	if clear {
+		userSession.Delete(sessionKey)
+		_ = session.Save(ctx, userSession)
+	}
+	return captchaCode == strings.ToLower(inputCaptchaCode)
 }

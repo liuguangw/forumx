@@ -10,7 +10,7 @@ import (
 )
 
 //PutItem 把数据写入缓存
-func PutItem(itemKey string, itemValue interface{}, expiredAt time.Time) error {
+func PutItem(ctx context.Context, itemKey string, itemValue interface{}, expiredAt time.Time) error {
 	coll, err := db.Collection(collectionName)
 	if err != nil {
 		return err
@@ -24,8 +24,9 @@ func PutItem(itemKey string, itemValue interface{}, expiredAt time.Time) error {
 		"item_key": itemKey,
 	}
 	opt := options.Update().SetUpsert(true)
-	ctx, cancel := context.WithTimeout(context.TODO(), 3*time.Second)
-	defer cancel()
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if _, err := coll.UpdateOne(ctx, filter, bson.M{
 		"$set": cacheObject,
 	}, opt); err != nil {
