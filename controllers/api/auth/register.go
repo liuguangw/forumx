@@ -4,8 +4,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/request"
-	"github.com/liuguangw/forumx/core/service"
-	"github.com/pkg/errors"
+	"github.com/liuguangw/forumx/core/service/captcha"
+	"github.com/liuguangw/forumx/core/service/response"
+	"github.com/liuguangw/forumx/core/service/session"
+	"github.com/liuguangw/forumx/core/service/tools"
+	"github.com/liuguangw/forumx/core/service/user"
 )
 
 //Register 处理用户注册请求
@@ -13,40 +16,35 @@ func Register(c *fiber.Ctx) error {
 	//获取所需参数
 	req, err := request.NewRegisterAccount(c)
 	if err != nil {
-		return service.WriteAppErrorResponse(c, err)
+		return response.WriteAppError(c, err)
 	}
 	if err := req.CheckRequest(); err != nil {
-		return service.WriteAppErrorResponse(c, err)
+		return response.WriteAppError(c, err)
 	}
 	//加载session
-	sessionID := service.GetRequestSessionID(c)
-	userSession, err1 := service.GetUserSessionByID(sessionID)
-	if err1 != nil {
-		return service.WriteInternalErrorResponse(c, errors.Wrap(err1, "load session "+sessionID+" failed"))
-	}
-	if userSession == nil {
-		return service.WriteAppErrorResponse(c, &common.AppError{
-			Code:    common.ErrorSessionExpired,
-			Message: "会话已失效",
-		})
+	ctx, cancel := tools.DefaultExecContext()
+	defer cancel()
+	userSession, err1 := session.CheckRequest(ctx, c)
+	if err1 != nil || userSession == nil {
+		return err1
 	}
 	//检测验证码
-	if !service.CheckCaptchaCode(userSession, req.CaptchaCode, true) {
-		return service.WriteAppErrorResponse(c, &common.AppError{
+	if !captcha.CheckCode(ctx, userSession, req.CaptchaCode, true) {
+		return response.WriteAppError(c, &common.AppError{
 			Code:    common.ErrorInputFieldInvalid,
 			Message: "验证码错误",
 		})
 	}
 	//注册账号
 	clientIP := c.IP()
-	user, registerError := service.RegisterUser(req.Username, req.Nickname,
+	userInfo, registerError := user.Register(ctx, req.Username, req.Nickname,
 		req.EmailAddress, req.Password, clientIP)
 	if registerError != nil {
-		return service.WriteAppErrorResponse(c, registerError)
+		return response.WriteAppError(c, registerError)
 	}
 	responseData := fiber.Map{
-		"id":       user.ID,
-		"nickname": user.Nickname,
+		"id":       userInfo.ID,
+		"nickname": userInfo.Nickname,
 	}
-	return service.WriteSuccessResponse(c, responseData)
+	return response.WriteSuccess(c, responseData)
 }

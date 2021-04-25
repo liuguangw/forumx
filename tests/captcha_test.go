@@ -2,7 +2,7 @@ package tests
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/liuguangw/forumx/core/service"
+	"github.com/liuguangw/forumx/core/service/session"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -21,7 +21,7 @@ func testCaptchaShow(app *fiber.App, sessionID string, t *testing.T) string {
 	assert.NoError(t, err)
 	assert.Equal(t, 200, res.StatusCode)
 	//获取图形验证码
-	userSession, err := service.GetUserSessionByID(sessionID)
+	userSession, err := session.LoadByID(nil, sessionID)
 	assert.NoError(t, err)
 	return userSession.Data["captcha_code"].(string)
 }

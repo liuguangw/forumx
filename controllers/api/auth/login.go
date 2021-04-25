@@ -4,7 +4,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/request"
-	"github.com/liuguangw/forumx/core/service"
+	"github.com/liuguangw/forumx/core/service/captcha"
+	"github.com/liuguangw/forumx/core/service/response"
+	"github.com/liuguangw/forumx/core/service/session"
+	"github.com/liuguangw/forumx/core/service/tools"
+	"github.com/liuguangw/forumx/core/service/user"
 	"github.com/pkg/errors"
 	"time"
 )
@@ -14,43 +18,38 @@ func Login(c *fiber.Ctx) error {
 	//获取所需参数
 	req, err := request.NewLoginAccount(c)
 	if err != nil {
-		return service.WriteAppErrorResponse(c, err)
+		return response.WriteAppError(c, err)
 	}
 	if err := req.CheckRequest(); err != nil {
-		return service.WriteAppErrorResponse(c, err)
+		return response.WriteAppError(c, err)
 	}
 	//加载session
-	sessionID := service.GetRequestSessionID(c)
-	userSession, err1 := service.GetUserSessionByID(sessionID)
-	if err1 != nil {
-		return service.WriteInternalErrorResponse(c, errors.Wrap(err1, "load session "+sessionID+" failed"))
-	}
-	if userSession == nil {
-		return service.WriteAppErrorResponse(c, &common.AppError{
-			Code:    common.ErrorSessionExpired,
-			Message: "会话已失效",
-		})
+	ctx, cancel := tools.DefaultExecContext()
+	defer cancel()
+	userSession, err1 := session.CheckRequest(ctx, c)
+	if err1 != nil || userSession == nil {
+		return err1
 	}
 	//检测验证码
-	if !service.CheckCaptchaCode(userSession, req.CaptchaCode, true) {
-		return service.WriteAppErrorResponse(c, &common.AppError{
+	if !captcha.CheckCode(ctx, userSession, req.CaptchaCode, true) {
+		return response.WriteAppError(c, &common.AppError{
 			Code:    common.ErrorInputFieldInvalid,
 			Message: "验证码错误",
 		})
 	}
 	//判断密码是否正确
-	userInfo, dbErr := service.FindUserByUsername(req.Username)
+	userInfo, dbErr := user.FindUserByUsername(ctx, req.Username)
 	if dbErr != nil {
-		return service.WriteInternalErrorResponse(c, errors.Wrap(err1, "find user "+req.Username+" failed"))
+		return response.WriteInternalError(c, errors.Wrap(err1, "find user "+req.Username+" failed"))
 	}
 	if userInfo == nil {
-		return service.WriteAppErrorResponse(c, &common.AppError{
+		return response.WriteAppError(c, &common.AppError{
 			Code:    common.ErrorUserNotFound,
 			Message: "不存在此用户",
 		})
 	}
-	if !service.VerifyPassword(userInfo, req.Password) {
-		return service.WriteAppErrorResponse(c, &common.AppError{
+	if !user.VerifyPassword(userInfo, req.Password) {
+		return response.WriteAppError(c, &common.AppError{
 			Code:    common.ErrorPassword,
 			Message: "用户名或密码错误",
 		})
@@ -63,11 +62,11 @@ func Login(c *fiber.Ctx) error {
 	//session生命周期重新设置
 	userSession.ExpiredAt = time.Now().Add(5 * 24 * time.Hour)
 	//保存会话数据
-	if err := service.SaveUserSession(userSession); err != nil {
-		return service.WriteInternalErrorResponse(c, errors.Wrap(err1, "save session "+sessionID+" failed"))
+	if err := session.Save(ctx, userSession); err != nil {
+		return response.WriteInternalError(c, errors.Wrap(err1, "save session "+userSession.ID+" failed"))
 	}
 	if userInfo.Enable2FA {
-		return service.WriteAppErrorResponse(c, &common.AppError{
+		return response.WriteAppError(c, &common.AppError{
 			Code:    common.ErrorNeedAuthentication,
 			Message: "需要身份验证",
 		})
@@ -76,5 +75,5 @@ func Login(c *fiber.Ctx) error {
 		"id":       userInfo.ID,
 		"nickname": userInfo.Nickname,
 	}
-	return service.WriteSuccessResponse(c, responseData)
+	return response.WriteSuccess(c, responseData)
 }

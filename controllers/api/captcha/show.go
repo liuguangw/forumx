@@ -2,27 +2,25 @@ package captcha
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/liuguangw/forumx/core/common"
-	"github.com/liuguangw/forumx/core/service"
+	"github.com/liuguangw/forumx/core/service/captcha"
+	"github.com/liuguangw/forumx/core/service/response"
+	"github.com/liuguangw/forumx/core/service/session"
+	"github.com/liuguangw/forumx/core/service/tools"
 	"github.com/pkg/errors"
 )
 
 //Show 显示图形验证码
 func Show(c *fiber.Ctx) error {
-	sessionID := service.GetRequestSessionID(c)
-	userSession, err := service.GetUserSessionByID(sessionID)
-	if err != nil {
-		return service.WriteInternalErrorResponse(c, errors.Wrap(err, "load session "+sessionID+" failed"))
+	//加载session
+	ctx, cancel := tools.DefaultExecContext()
+	defer cancel()
+	userSession, err1 := session.CheckRequest(ctx, c)
+	if err1 != nil || userSession == nil {
+		return err1
 	}
-	if userSession == nil {
-		return service.WriteAppErrorResponse(c, &common.AppError{
-			Code:    common.ErrorSessionExpired,
-			Message: "会话已失效",
-		})
-	}
-	binData, err := service.CreateCaptcha(userSession)
+	binData, err := captcha.CreateImage(ctx, userSession)
 	if err != nil {
-		return service.WriteInternalErrorResponse(c, errors.Wrap(err, "生成验证码失败"))
+		return response.WriteInternalError(c, errors.Wrap(err, "生成验证码失败"))
 	}
 	if _, err := c.Write(binData); err != nil {
 		return err
