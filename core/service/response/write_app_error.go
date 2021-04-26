@@ -6,10 +6,9 @@ import (
 )
 
 //WriteAppError 应用错误的response
-func WriteAppError(c *fiber.Ctx, err *common.AppError) error {
-	resp := common.AppResponse{
-		Code:    err.Code,
-		Message: err.Message,
-	}
-	return Write(c, &resp)
+func WriteAppError(c *fiber.Ctx, code int, message string) error {
+	return Write(c, &common.AppResponse{
+		Code:    code,
+		Message: message,
+	})
 }

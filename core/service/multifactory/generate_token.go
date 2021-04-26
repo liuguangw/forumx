@@ -14,6 +14,7 @@ func GenerateToken(ctx context.Context, userSession *models.UserSession) (*TotpT
 	optKey, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "tmp_issuer",
 		AccountName: "tmp_user",
+		SecretSize:  10,
 	})
 	if err != nil {
 		return nil, err

@@ -17,10 +17,7 @@ func RecoverHandle(c *fiber.Ctx) error {
 			//记录错误信息
 			defaultStackTraceHandler(r)
 			//返回给客户端的响应
-			_ = response.WriteAppError(c, &common.AppError{
-				Code:    common.ErrorInternalServer,
-				Message: "服务器异常",
-			})
+			_ = response.WriteAppError(c, common.ErrorInternalServer, "服务器异常")
 		}
 	}()
 	return c.Next()

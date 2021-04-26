@@ -1,0 +1,28 @@
+package user
+
+import (
+	"context"
+	"github.com/liuguangw/forumx/core/db"
+	"github.com/liuguangw/forumx/core/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+//FindUserByID 使用用户ID查找用户信息
+func FindUserByID(ctx context.Context, userID int64) (*models.User, error) {
+	coll, err := db.Collection(collectionName)
+	if err != nil {
+		return nil, err
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	userInfo := new(models.User)
+	if err := coll.FindOne(ctx, bson.M{"id": userID}).Decode(userInfo); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return userInfo, nil
+}

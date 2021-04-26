@@ -30,10 +30,7 @@ func (req *LoginAccount) CheckRequest() *common.AppError {
 func NewLoginAccount(c *fiber.Ctx) (*LoginAccount, *common.AppError) {
 	req := new(LoginAccount)
 	if err := c.BodyParser(req); err != nil {
-		return nil, &common.AppError{
-			Code:    common.ErrorBadRequest,
-			Message: err.Error(),
-		}
+		return nil, common.NewAppError(common.ErrorBadRequest, err.Error())
 	}
 	return req, nil
 }

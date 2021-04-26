@@ -14,10 +14,7 @@ import (
 func CheckRequest(ctx context.Context, c *fiber.Ctx) (*models.UserSession, error) {
 	sessionID := getRequestSessionID(c)
 	if sessionID == "" {
-		return nil, response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorSessionExpired,
-			Message: "未传入会话ID",
-		})
+		return nil, response.WriteAppError(c, common.ErrorSessionExpired, "未传入会话ID")
 	}
 	if ctx == nil {
 		ctx = context.Background()
@@ -27,10 +24,7 @@ func CheckRequest(ctx context.Context, c *fiber.Ctx) (*models.UserSession, error
 		return nil, response.WriteInternalError(c, errors.Wrap(err, "load session "+sessionID+" failed"))
 	}
 	if userSession == nil {
-		return nil, response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorSessionExpired,
-			Message: "会话无效或者已经过期",
-		})
+		return nil, response.WriteAppError(c, common.ErrorSessionExpired, "会话无效或者已经过期")
 	}
 	return userSession, nil
 }

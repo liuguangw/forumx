@@ -26,4 +26,15 @@ func TestAPI(t *testing.T) {
 	t.Run("auth.Login", func(t *testing.T) {
 		testAuthLogin(app, sessionID, t)
 	})
+	t.Run("auth.MultiFactoryToken", func(t *testing.T) {
+		testMultiFactoryToken(app, sessionID, t)
+	})
+	t.Run("auth.MultiFactoryBind", func(t *testing.T) {
+		testMultiFactoryBind(app, sessionID, t)
+	})
+	//初始化新的session ID
+	sessionID = testSessionInitNew(app, t)
+	t.Run("auth.Login.v2", func(t *testing.T) {
+		testAuth2FALogin(app, sessionID, t)
+	})
 }

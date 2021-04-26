@@ -19,10 +19,7 @@ func CheckLogin(ctx context.Context, c *fiber.Ctx) (*models.UserSession, error) 
 	}
 	//用户未登录
 	if userSession.UserID == 0 {
-		return nil, response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorNotLogin,
-			Message: "当前用户未登录",
-		})
+		return nil, response.WriteAppError(c, common.ErrorNotLogin, "当前用户未登录")
 	}
 	return userSession, nil
 }

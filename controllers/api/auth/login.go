@@ -16,12 +16,12 @@ import (
 //Login 处理用户登录请求
 func Login(c *fiber.Ctx) error {
 	//获取所需参数
-	req, err := request.NewLoginAccount(c)
-	if err != nil {
-		return response.WriteAppError(c, err)
+	req, requestErr := request.NewLoginAccount(c)
+	if requestErr != nil {
+		return requestErr.WriteResponse(c)
 	}
 	if err := req.CheckRequest(); err != nil {
-		return response.WriteAppError(c, err)
+		return err.WriteResponse(c)
 	}
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
@@ -32,10 +32,7 @@ func Login(c *fiber.Ctx) error {
 	}
 	//检测验证码
 	if !captcha.CheckCode(ctx, userSession, req.CaptchaCode, true) {
-		return response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorInputFieldInvalid,
-			Message: "验证码错误",
-		})
+		return response.WriteAppError(c, common.ErrorInputFieldInvalid, "验证码错误")
 	}
 	//判断密码是否正确
 	userInfo, dbErr := user.FindUserByUsername(ctx, req.Username)
@@ -43,16 +40,10 @@ func Login(c *fiber.Ctx) error {
 		return response.WriteInternalError(c, errors.Wrap(err1, "find user "+req.Username+" failed"))
 	}
 	if userInfo == nil {
-		return response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorUserNotFound,
-			Message: "不存在此用户",
-		})
+		return response.WriteAppError(c, common.ErrorUserNotFound, "不存在此用户")
 	}
 	if !user.VerifyPassword(userInfo, req.Password) {
-		return response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorPassword,
-			Message: "用户名或密码错误",
-		})
+		return response.WriteAppError(c, common.ErrorPassword, "用户名或密码错误")
 	}
 	userSession.UserID = userInfo.ID
 	userSession.Authed = true
@@ -66,10 +57,7 @@ func Login(c *fiber.Ctx) error {
 		return response.WriteInternalError(c, errors.Wrap(err1, "save session "+userSession.ID+" failed"))
 	}
 	if userInfo.Enable2FA {
-		return response.WriteAppError(c, &common.AppError{
-			Code:    common.ErrorNeedAuthentication,
-			Message: "需要身份验证",
-		})
+		return response.WriteAppError(c, common.ErrorNeedAuthentication, "需要身份验证")
 	}
 	responseData := map[string]interface{}{
 		"id":       userInfo.ID,

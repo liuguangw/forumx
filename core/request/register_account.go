@@ -38,10 +38,7 @@ func (req *RegisterAccount) CheckRequest() *common.AppError {
 func NewRegisterAccount(c *fiber.Ctx) (*RegisterAccount, *common.AppError) {
 	req := new(RegisterAccount)
 	if err := c.BodyParser(req); err != nil {
-		return nil, &common.AppError{
-			Code:    common.ErrorBadRequest,
-			Message: err.Error(),
-		}
+		return nil, common.NewAppError(common.ErrorBadRequest, err.Error())
 	}
 	return req, nil
 }

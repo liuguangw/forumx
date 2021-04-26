@@ -17,6 +17,7 @@ const (
 //50系列
 const (
 	ErrorInternalServer    = 5000 + iota //内部错误
+	ErrorCommonMessage                   //通用的错误消息
 	ErrorBadRequest                      //输入无效(表单或者json解析失败)
 	ErrorInputFieldIsEmpty               //所需字段为空
 	ErrorInputFieldInvalid               //输入的字段值无效
