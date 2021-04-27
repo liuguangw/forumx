@@ -6,7 +6,6 @@ import "time"
 type UserSession struct {
 	ID        string            `bson:"id"`         //用户会话ID
 	UserID    int64             `bson:"user_id"`    //用户ID
-	Authed    bool              `bson:"authed"`     //是否通过了身份验证
 	Data      map[string]string `bson:"data"`       //会话数据
 	CreatedAt time.Time         `bson:"created_at"` //创建时间
 	UpdatedAt time.Time         `bson:"updated_at"` //最后更新时间

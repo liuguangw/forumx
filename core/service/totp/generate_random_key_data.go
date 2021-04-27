@@ -9,8 +9,8 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
-//GenerateToken 随机生成totp密钥,并将其暂时存入session中
-func GenerateToken(ctx context.Context, userSession *models.UserSession) (*TokenData, error) {
+//GenerateRandomKeyData 随机生成totp密钥,并将其暂时存入session中
+func GenerateRandomKeyData(ctx context.Context, userSession *models.UserSession) (*RandomKeyData, error) {
 	optKey, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "tmp_issuer",
 		AccountName: "tmp_user",
@@ -19,7 +19,7 @@ func GenerateToken(ctx context.Context, userSession *models.UserSession) (*Token
 	if err != nil {
 		return nil, err
 	}
-	tokenData := TokenData{
+	tokenData := RandomKeyData{
 		SecretKey:    optKey.Secret(),
 		RecoveryCode: tools.GenerateRandomString(8),
 	}

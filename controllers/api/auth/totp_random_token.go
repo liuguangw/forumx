@@ -20,7 +20,7 @@ func TotpRandomToken(c *fiber.Ctx) error {
 	if err != nil || userSession == nil {
 		return err
 	}
-	tokenData, err := totp.GenerateToken(ctx, userSession)
+	tokenData, err := totp.GenerateRandomKeyData(ctx, userSession)
 	if err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "生成totp token失败"))
 	}

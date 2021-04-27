@@ -57,7 +57,7 @@ func testTotpBind(app *fiber.App, sessionID string, t *testing.T) {
 	userSession, err := session.LoadByID(ctx, sessionID)
 	assert.NoError(t, err)
 	//读取令牌信息
-	tokenData, err := totp.LoadTokenFromSession(userSession)
+	tokenData, err := totp.LoadKeyDataFromSession(userSession)
 	assert.NoError(t, err)
 	code, err := totp2.GenerateCode(tokenData.SecretKey, time.Now())
 	assert.NoError(t, err)
@@ -108,7 +108,7 @@ func testAuth2FALogin(app *fiber.App, sessionID string, t *testing.T) {
 	assert.NotEqual(t, 0, userID)
 	assert.False(t, userSession.Authed)
 	//获取密钥
-	tokenData, err := totp.FindTokenByUserID(ctx, userID)
+	tokenData, err := totp.FindTotpKeyByUserID(ctx, userID)
 	assert.NoError(t, err)
 	assert.NotNil(t, tokenData)
 	secretKey := tokenData.SecretKey

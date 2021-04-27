@@ -16,7 +16,7 @@ import (
 //TotpBind 绑定两步验证令牌
 func TotpBind(c *fiber.Ctx) error {
 	//获取所需参数
-	req, requestErr := request.NewMultiFactoryBind(c)
+	req, requestErr := request.NewTotpBind(c)
 	if requestErr != nil {
 		return requestErr.WriteResponse(c)
 	}
@@ -39,7 +39,7 @@ func TotpBind(c *fiber.Ctx) error {
 		return response.WriteAppError(c, common.ErrorCommonMessage, "您的账户已经启用过两步验证了")
 	}
 	//读取令牌信息
-	tokenData, err := totp.LoadTokenFromSession(userSession)
+	tokenData, err := totp.LoadKeyDataFromSession(userSession)
 	if err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "解码令牌数据失败"))
 	}

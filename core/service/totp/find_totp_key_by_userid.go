@@ -9,8 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//FindTokenByUserID 根据用户ID查找用户绑定的令牌记录,如果数据不存在则返回nil
-func FindTokenByUserID(ctx context.Context, userID int64) (*models.UserTotpKey, error) {
+//FindTotpKeyByUserID 根据用户ID查找用户绑定的令牌记录,如果数据不存在则返回nil
+func FindTotpKeyByUserID(ctx context.Context, userID int64) (*models.UserTotpKey, error) {
 	coll, err := db.Collection(common.UserTotpKeyCollectionName)
 	if err != nil {
 		return nil, err

@@ -10,7 +10,6 @@ import (
 	"github.com/liuguangw/forumx/core/service/tools"
 	"github.com/liuguangw/forumx/core/service/user"
 	"github.com/pkg/errors"
-	"time"
 )
 
 //Login 处理用户登录请求
@@ -37,7 +36,7 @@ func Login(c *fiber.Ctx) error {
 	//判断密码是否正确
 	userInfo, dbErr := user.FindUserByUsername(ctx, req.Username)
 	if dbErr != nil {
-		return response.WriteInternalError(c, errors.Wrap(err1, "find user "+req.Username+" failed"))
+		return response.WriteInternalError(c, errors.Wrap(dbErr, "find user "+req.Username+" failed"))
 	}
 	if userInfo == nil {
 		return response.WriteAppError(c, common.ErrorUserNotFound, "不存在此用户")
@@ -45,23 +44,29 @@ func Login(c *fiber.Ctx) error {
 	if !user.VerifyPassword(userInfo, req.Password) {
 		return response.WriteAppError(c, common.ErrorPassword, "用户名或密码错误")
 	}
-	userSession.UserID = userInfo.ID
-	userSession.Authed = true
-	if userInfo.Enable2FA {
-		userSession.Authed = false
+	userID := userInfo.ID
+	//未开启两步验证的直接登录成功
+	if !userInfo.Enable2FA {
+		if err := session.LoginUser(ctx, userSession, userID); err != nil {
+			return response.WriteInternalError(c, errors.Wrap(err, "用户登录失败"))
+		}
+		responseData := map[string]interface{}{
+			"id":       userID,
+			"nickname": userInfo.Nickname,
+		}
+		return response.WriteSuccess(c, responseData)
 	}
-	//session生命周期重新设置
-	userSession.ExpiredAt = time.Now().Add(5 * 24 * time.Hour)
-	//保存会话数据
-	if err := session.Save(ctx, userSession); err != nil {
-		return response.WriteInternalError(c, errors.Wrap(err1, "save session "+userSession.ID+" failed"))
+	//生成临时的totp token缓存
+	totpAuthToken, err := user.PrepareTotpAuth(ctx, userID)
+	if err != nil {
+		return response.WriteInternalError(c, errors.Wrap(err1, "prepare totp auth for "+req.Username+" failed"))
 	}
-	if userInfo.Enable2FA {
-		return response.WriteAppError(c, common.ErrorNeedAuthentication, "需要身份验证")
+	totpResponse := &common.AppResponse{
+		Code:    common.ErrorNeedAuthentication,
+		Message: "需要二次验证",
+		Data: map[string]string{
+			"token": totpAuthToken,
+		},
 	}
-	responseData := map[string]interface{}{
-		"id":       userInfo.ID,
-		"nickname": userInfo.Nickname,
-	}
-	return response.WriteSuccess(c, responseData)
+	return response.Write(c, totpResponse)
 }
