@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +12,7 @@ import (
 
 //PutItem 把数据写入缓存
 func PutItem(ctx context.Context, itemKey string, itemValue interface{}, expiredAt time.Time) error {
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.CacheCollectionName)
 	if err != nil {
 		return err
 	}

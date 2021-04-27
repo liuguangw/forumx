@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,7 @@ type CreateCountersCollection struct {
 }
 
 func (*CreateCountersCollection) collectionName() string {
-	return db.CollectionFullName("counters")
+	return db.CollectionFullName(common.CounterCollectionName)
 }
 
 //Name 迁移的名称

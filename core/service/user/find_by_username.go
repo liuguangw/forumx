@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +11,7 @@ import (
 
 //FindUserByUsername 使用用户名查找用户信息
 func FindUserByUsername(ctx context.Context, username string) (*models.User, error) {
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.UserCollectionName)
 	if err != nil {
 		return nil, err
 	}

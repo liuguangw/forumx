@@ -4,17 +4,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/request"
-	"github.com/liuguangw/forumx/core/service/multifactory"
 	"github.com/liuguangw/forumx/core/service/response"
 	"github.com/liuguangw/forumx/core/service/session"
 	"github.com/liuguangw/forumx/core/service/tools"
+	"github.com/liuguangw/forumx/core/service/totp"
 	"github.com/liuguangw/forumx/core/service/user"
 	"github.com/pkg/errors"
-	"github.com/pquerna/otp/totp"
+	totp2 "github.com/pquerna/otp/totp"
 )
 
-//MultiFactoryBind 绑定两步验证令牌
-func MultiFactoryBind(c *fiber.Ctx) error {
+//TotpBind 绑定两步验证令牌
+func TotpBind(c *fiber.Ctx) error {
 	//获取所需参数
 	req, requestErr := request.NewMultiFactoryBind(c)
 	if requestErr != nil {
@@ -39,15 +39,15 @@ func MultiFactoryBind(c *fiber.Ctx) error {
 		return response.WriteAppError(c, common.ErrorCommonMessage, "您的账户已经启用过两步验证了")
 	}
 	//读取令牌信息
-	tokenData, err := multifactory.LoadTokenFromSession(userSession)
+	tokenData, err := totp.LoadTokenFromSession(userSession)
 	if err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "解码令牌数据失败"))
 	}
 	//验证动态码是否正确
-	if !totp.Validate(req.Code, tokenData.SecretKey) {
+	if !totp2.Validate(req.Code, tokenData.SecretKey) {
 		return response.WriteAppError(c, common.ErrorTwoFactorAuthenticationCode, "动态验证码错误")
 	}
-	if err := multifactory.BindUserAccount(ctx, userInfo, tokenData.SecretKey, tokenData.RecoveryCode); err != nil {
+	if err := totp.BindUserAccount(ctx, userInfo, tokenData.SecretKey, tokenData.RecoveryCode); err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "绑定两步验证令牌失败"))
 	}
 	return response.WriteSuccess(c, nil)

@@ -13,7 +13,7 @@ func allMigrations() []Migration {
 		new(migrations.CreateUserMobilesCollection),
 		new(migrations.InitCountersCollection),
 		new(migrations.CreateUserSessionsCollection),
-		new(migrations.CreateUserMultiFactoryTokensCollection),
+		new(migrations.CreateUserTotpKeysCollection),
 		new(migrations.CreateCachesCollection),
 	}
 	return migrationList

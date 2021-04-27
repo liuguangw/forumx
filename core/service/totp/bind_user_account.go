@@ -1,7 +1,8 @@
-package multifactory
+package totp
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -26,13 +27,13 @@ func BindUserAccount(ctx context.Context, userInfo *models.User, secretKey, reco
 
 //bindUserAccountCallback 绑定两步验证令牌时,在MongoDB事务内调用的函数
 func bindUserAccountCallback(sessionContext mongo.SessionContext, userInfo *models.User, secretKey, recoveryCode string) error {
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.UserTotpKeyCollectionName)
 	if err != nil {
 		return err
 	}
 	//insert row
 	timeNow := time.Now()
-	itemInfo := &models.UserMultiFactoryToken{
+	itemInfo := &models.UserTotpKey{
 		UserID:       userInfo.ID,
 		SecretKey:    secretKey,
 		RecoveryCode: recoveryCode,
@@ -43,7 +44,7 @@ func bindUserAccountCallback(sessionContext mongo.SessionContext, userInfo *mode
 		return err
 	}
 	//update
-	userColl, err := db.Collection(userCollectionName)
+	userColl, err := db.Collection(common.UserCollectionName)
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,7 +23,7 @@ func Save(ctx context.Context, itemInfo *models.UserSession) error {
 		}
 		itemInfo.ID = sessionID
 	}
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.UserSessionCollectionName)
 	if err != nil {
 		return err
 	}

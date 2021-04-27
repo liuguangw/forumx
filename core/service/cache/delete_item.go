@@ -2,13 +2,14 @@ package cache
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 //DeleteItem 根据键名删除缓存
 func DeleteItem(ctx context.Context, itemKey string) error {
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.CacheCollectionName)
 	if err != nil {
 		return err
 	}

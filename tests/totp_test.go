@@ -6,10 +6,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/request"
-	"github.com/liuguangw/forumx/core/service/multifactory"
 	"github.com/liuguangw/forumx/core/service/session"
 	"github.com/liuguangw/forumx/core/service/tools"
-	"github.com/pquerna/otp/totp"
+	"github.com/liuguangw/forumx/core/service/totp"
+	totp2 "github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -17,11 +17,11 @@ import (
 	"time"
 )
 
-//testMultiFactoryToken 测试获取随机的totp密钥
-func testMultiFactoryToken(app *fiber.App, sessionID string, t *testing.T) {
+//testRandomToken 测试获取随机的totp密钥
+func testRandomToken(app *fiber.App, sessionID string, t *testing.T) {
 	req, err := http.NewRequest(
-		"POST",
-		"/api/auth/multi-factory-token",
+		"GET",
+		"/api/auth/totp/random-token",
 		bytes.NewBuffer([]byte{}),
 	)
 	assert.NoError(t, err)
@@ -50,16 +50,16 @@ func testMultiFactoryToken(app *fiber.App, sessionID string, t *testing.T) {
 	assert.NotEmpty(t, responseData.RecoveryCode)
 }
 
-//testMultiFactoryBind 测试绑定两步验证令牌
-func testMultiFactoryBind(app *fiber.App, sessionID string, t *testing.T) {
+//testTotpBind 测试绑定两步验证令牌
+func testTotpBind(app *fiber.App, sessionID string, t *testing.T) {
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
 	userSession, err := session.LoadByID(ctx, sessionID)
 	assert.NoError(t, err)
 	//读取令牌信息
-	tokenData, err := multifactory.LoadTokenFromSession(userSession)
+	tokenData, err := totp.LoadTokenFromSession(userSession)
 	assert.NoError(t, err)
-	code, err := totp.GenerateCode(tokenData.SecretKey, time.Now())
+	code, err := totp2.GenerateCode(tokenData.SecretKey, time.Now())
 	assert.NoError(t, err)
 	requestData, err := json.Marshal(map[string]string{
 		"code": code,
@@ -68,7 +68,7 @@ func testMultiFactoryBind(app *fiber.App, sessionID string, t *testing.T) {
 	//请求绑定接口
 	req, err := http.NewRequest(
 		"POST",
-		"/api/auth/multi-factory-bind",
+		"/api/auth/totp/bind",
 		bytes.NewBuffer(requestData),
 	)
 	assert.NoError(t, err)
@@ -108,11 +108,11 @@ func testAuth2FALogin(app *fiber.App, sessionID string, t *testing.T) {
 	assert.NotEqual(t, 0, userID)
 	assert.False(t, userSession.Authed)
 	//获取密钥
-	tokenData, err := multifactory.FindTokenByUserID(ctx, userID)
+	tokenData, err := totp.FindTokenByUserID(ctx, userID)
 	assert.NoError(t, err)
 	assert.NotNil(t, tokenData)
 	secretKey := tokenData.SecretKey
-	code, err := totp.GenerateCode(secretKey, time.Now())
+	code, err := totp2.GenerateCode(secretKey, time.Now())
 	assert.NoError(t, err)
 	verifyRequest := map[string]string{
 		"code": code,
@@ -122,7 +122,7 @@ func testAuth2FALogin(app *fiber.App, sessionID string, t *testing.T) {
 	//请求验证接口
 	req, err := http.NewRequest(
 		"POST",
-		"/api/auth/multi-factory-verify",
+		"/api/auth/totp/verify",
 		bytes.NewBuffer(requestData),
 	)
 	assert.NoError(t, err)

@@ -1,4 +1,4 @@
-package multifactory
+package totp
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 //GenerateToken 随机生成totp密钥,并将其暂时存入session中
-func GenerateToken(ctx context.Context, userSession *models.UserSession) (*TotpTokenData, error) {
+func GenerateToken(ctx context.Context, userSession *models.UserSession) (*TokenData, error) {
 	optKey, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "tmp_issuer",
 		AccountName: "tmp_user",
@@ -19,7 +19,7 @@ func GenerateToken(ctx context.Context, userSession *models.UserSession) (*TotpT
 	if err != nil {
 		return nil, err
 	}
-	tokenData := TotpTokenData{
+	tokenData := TokenData{
 		SecretKey:    optKey.Secret(),
 		RecoveryCode: tools.GenerateRandomString(8),
 	}

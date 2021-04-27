@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -9,21 +10,21 @@ import (
 	"time"
 )
 
-//CreateUserMultiFactoryTokensCollection 创建用户两步验证token集合
-type CreateUserMultiFactoryTokensCollection struct {
+//CreateUserTotpKeysCollection 创建用户TOTP密钥绑定记录集合
+type CreateUserTotpKeysCollection struct {
 }
 
-func (*CreateUserMultiFactoryTokensCollection) collectionName() string {
-	return db.CollectionFullName("user_multi_factor_tokens")
+func (*CreateUserTotpKeysCollection) collectionName() string {
+	return db.CollectionFullName(common.UserTotpKeyCollectionName)
 }
 
 //Name 迁移的名称
-func (*CreateUserMultiFactoryTokensCollection) Name() string {
-	return "d2021_04_21_163324_create_user_multi_factor_tokens_collection"
+func (*CreateUserTotpKeysCollection) Name() string {
+	return "d2021_04_21_163324_create_user_totp_keys_collection"
 }
 
 //Up 执行迁移
-func (c *CreateUserMultiFactoryTokensCollection) Up() error {
+func (c *CreateUserTotpKeysCollection) Up() error {
 	database, err := db.Database()
 	if err != nil {
 		return err
@@ -53,7 +54,7 @@ func (c *CreateUserMultiFactoryTokensCollection) Up() error {
 }
 
 //Down 回滚迁移
-func (c *CreateUserMultiFactoryTokensCollection) Down() error {
+func (c *CreateUserTotpKeysCollection) Down() error {
 	database, err := db.Database()
 	if err != nil {
 		return err

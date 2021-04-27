@@ -3,16 +3,16 @@ package auth
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/liuguangw/forumx/core/environment"
-	"github.com/liuguangw/forumx/core/service/multifactory"
 	"github.com/liuguangw/forumx/core/service/response"
 	"github.com/liuguangw/forumx/core/service/session"
 	"github.com/liuguangw/forumx/core/service/tools"
+	"github.com/liuguangw/forumx/core/service/totp"
 	"github.com/liuguangw/forumx/core/service/user"
 	"github.com/pkg/errors"
 )
 
-//MultiFactoryToken 返回两步验证的令牌ID、密钥给客户端
-func MultiFactoryToken(c *fiber.Ctx) error {
+//TotpRandomToken 返回随机的两步验证密钥、恢复码给客户端
+func TotpRandomToken(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
@@ -20,7 +20,7 @@ func MultiFactoryToken(c *fiber.Ctx) error {
 	if err != nil || userSession == nil {
 		return err
 	}
-	tokenData, err := multifactory.GenerateToken(ctx, userSession)
+	tokenData, err := totp.GenerateToken(ctx, userSession)
 	if err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "生成totp token失败"))
 	}

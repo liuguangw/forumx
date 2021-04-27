@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"github.com/liuguangw/forumx/core/service/tools"
@@ -45,7 +46,7 @@ func Register(ctx context.Context, username, nickname, email, password, clientIP
 //registerUserCallback 注册用户时,在MongoDB事务内调用的函数
 func registerUserCallback(sessionContext mongo.SessionContext, userInfo *models.User) error {
 	//计数器 用户ID+1
-	counterColl, err := db.Collection(counterCollectionName)
+	counterColl, err := db.Collection(common.CounterCollectionName)
 	if err != nil {
 		return err
 	}
@@ -65,7 +66,7 @@ func registerUserCallback(sessionContext mongo.SessionContext, userInfo *models.
 	//设置用户ID
 	userInfo.ID = updatedDocument.CounterValue
 	//插入用户数据
-	userColl, err := db.Collection(collectionName)
+	userColl, err := db.Collection(common.UserCollectionName)
 	if err != nil {
 		return err
 	}

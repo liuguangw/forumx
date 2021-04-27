@@ -2,13 +2,14 @@ package user
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 //EmailExists 判断指定的邮箱是否已存在绑定记录
 func EmailExists(ctx context.Context, emailAddress string) (bool, error) {
-	coll, err := db.Collection(userEmailCollectionName)
+	coll, err := db.Collection(common.UserEmailCollectionName)
 	if err != nil {
 		return false, err
 	}

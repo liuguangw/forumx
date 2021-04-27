@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +15,7 @@ type CreateUsersCollection struct {
 }
 
 func (*CreateUsersCollection) collectionName() string {
-	return db.CollectionFullName("users")
+	return db.CollectionFullName(common.UserCollectionName)
 }
 
 //Name 迁移的名称

@@ -30,7 +30,7 @@ func CheckRegisterUserExists(ctx context.Context, username, email string) *commo
 
 //usernameExists 判断指定的用户名是否已经注册
 func usernameExists(ctx context.Context, username string) (bool, error) {
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.UserCollectionName)
 	if err != nil {
 		return false, err
 	}

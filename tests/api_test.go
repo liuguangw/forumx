@@ -27,10 +27,10 @@ func TestAPI(t *testing.T) {
 		testAuthLogin(app, sessionID, t)
 	})
 	t.Run("auth.MultiFactoryToken", func(t *testing.T) {
-		testMultiFactoryToken(app, sessionID, t)
+		testRandomToken(app, sessionID, t)
 	})
 	t.Run("auth.MultiFactoryBind", func(t *testing.T) {
-		testMultiFactoryBind(app, sessionID, t)
+		testTotpBind(app, sessionID, t)
 	})
 	//初始化新的session ID
 	sessionID = testSessionInitNew(app, t)

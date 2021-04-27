@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +12,7 @@ import (
 
 //GetItem 从缓存中加载数据,如果缓存存在则为true
 func GetItem(ctx context.Context, itemKey string, cachedItem interface{}) (bool, error) {
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.CacheCollectionName)
 	if err != nil {
 		return false, err
 	}

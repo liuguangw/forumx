@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,7 +12,7 @@ import (
 //LoadByID 根据sessionID加载session会话
 func LoadByID(ctx context.Context, sessionID string) (*models.UserSession, error) {
 	itemInfo := new(models.UserSession)
-	coll, err := db.Collection(collectionName)
+	coll, err := db.Collection(common.UserSessionCollectionName)
 	if err != nil {
 		return nil, err
 	}
