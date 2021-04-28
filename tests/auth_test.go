@@ -13,7 +13,7 @@ import (
 )
 
 //testAuthRegister 测试注册
-func testAuthRegister(app *fiber.App, sessionID string, t *testing.T) {
+func testAuthRegister(app *fiber.App, sessionID string, t *testing.T) int64 {
 	captchaCode := testCaptchaShow(app, sessionID, t)
 	//构造请求数据
 	registerRequest := &request.RegisterAccount{
@@ -56,6 +56,7 @@ func testAuthRegister(app *fiber.App, sessionID string, t *testing.T) {
 	assert.NotEmpty(t, userID)
 	nickname := responseData.Nickname
 	assert.Equal(t, registerRequest.Nickname, nickname)
+	return userID
 }
 
 type loginAPIResponse = struct {
@@ -63,6 +64,7 @@ type loginAPIResponse = struct {
 	Data *struct {
 		ID       int64  `json:"id"`       //用户ID
 		Nickname string `json:"nickname"` //昵称
+		Token    string `json:"token"`    //totp token
 	} `json:"data"` //响应数据
 }
 

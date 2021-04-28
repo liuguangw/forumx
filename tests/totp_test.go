@@ -88,7 +88,7 @@ func testTotpBind(app *fiber.App, sessionID string, t *testing.T) {
 }
 
 //testAuth2FALogin 测试两步验证登录
-func testAuth2FALogin(app *fiber.App, sessionID string, t *testing.T) {
+func testAuth2FALogin(app *fiber.App, sessionID string, userID int64, t *testing.T) {
 	captchaCode := testCaptchaShow(app, sessionID, t)
 	//构造请求数据
 	loginRequest := &request.LoginAccount{
@@ -99,23 +99,26 @@ func testAuth2FALogin(app *fiber.App, sessionID string, t *testing.T) {
 	appResponse := requestLoginAPI(app, sessionID, loginRequest, t)
 	//需要身份验证
 	assert.Equal(t, common.ErrorNeedAuthentication, appResponse.Code, appResponse.Message)
+	responseData := appResponse.Data
+	assert.NotNil(t, responseData)
+	totpToken := responseData.Token
+	assert.NotEmpty(t, totpToken)
 	//判断session 状态
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
 	userSession, err := session.LoadByID(ctx, sessionID)
 	assert.NoError(t, err)
-	userID := userSession.UserID
-	assert.NotEqual(t, 0, userID)
-	assert.False(t, userSession.Authed)
-	//获取密钥
-	tokenData, err := totp.FindTotpKeyByUserID(ctx, userID)
+	assert.Empty(t, userSession.UserID)
+	//根据userID获取密钥
+	totpKeyData, err := totp.FindTotpKeyByUserID(ctx, userID)
 	assert.NoError(t, err)
-	assert.NotNil(t, tokenData)
-	secretKey := tokenData.SecretKey
+	assert.NotNil(t, totpKeyData)
+	secretKey := totpKeyData.SecretKey
 	code, err := totp2.GenerateCode(secretKey, time.Now())
 	assert.NoError(t, err)
 	verifyRequest := map[string]string{
-		"code": code,
+		"token": totpToken,
+		"code":  code,
 	}
 	requestData, err := json.Marshal(verifyRequest)
 	assert.NoError(t, err)
@@ -144,5 +147,4 @@ func testAuth2FALogin(app *fiber.App, sessionID string, t *testing.T) {
 	assert.NoError(t, err)
 	userID = userSession.UserID
 	assert.NotEqual(t, 0, userID)
-	assert.True(t, userSession.Authed)
 }

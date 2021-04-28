@@ -13,7 +13,10 @@ func TestAPI(t *testing.T) {
 	t.Run("index.Hello", func(t *testing.T) {
 		testIndexHello(app, t)
 	})
-	var sessionID string
+	var (
+		sessionID string
+		userID    int64
+	)
 	t.Run("session.InitNew", func(t *testing.T) {
 		sessionID = testSessionInitNew(app, t)
 	})
@@ -21,7 +24,7 @@ func TestAPI(t *testing.T) {
 		testCaptchaShow(app, sessionID, t)
 	})
 	t.Run("auth.Register", func(t *testing.T) {
-		testAuthRegister(app, sessionID, t)
+		userID = testAuthRegister(app, sessionID, t)
 	})
 	t.Run("auth.Login", func(t *testing.T) {
 		testAuthLogin(app, sessionID, t)
@@ -35,6 +38,6 @@ func TestAPI(t *testing.T) {
 	//初始化新的session ID
 	sessionID = testSessionInitNew(app, t)
 	t.Run("auth.Login.v2", func(t *testing.T) {
-		testAuth2FALogin(app, sessionID, t)
+		testAuth2FALogin(app, sessionID, userID, t)
 	})
 }
