@@ -7,6 +7,7 @@ import (
 	"github.com/liuguangw/forumx/controllers/api/captcha"
 	"github.com/liuguangw/forumx/controllers/api/index"
 	"github.com/liuguangw/forumx/controllers/api/session"
+	"github.com/liuguangw/forumx/controllers/api/user"
 )
 
 //LoadAPIRoutes 加载系统路由和中间件配置
@@ -23,4 +24,6 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Get("/auth/totp/random-token", auth.TotpRandomToken)
 	apiGroup.Post("/auth/totp/bind", auth.TotpBind)
 	apiGroup.Post("/auth/totp/verify", auth.TotpVerify)
+
+	apiGroup.Get("/user/info", user.Info)
 }

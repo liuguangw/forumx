@@ -13,7 +13,7 @@ func CheckLogin(ctx context.Context, c *fiber.Ctx) (*models.UserSession, error) 
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	userSession, err := CheckRequest(ctx, c)
+	userSession, err := CheckSession(ctx, c)
 	if err != nil || userSession == nil {
 		return nil, err
 	}

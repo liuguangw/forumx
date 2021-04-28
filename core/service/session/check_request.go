@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-//CheckRequest 判断用户的session ID是否存在切有效,如果无效则直接返回错误码给客户端
-func CheckRequest(ctx context.Context, c *fiber.Ctx) (*models.UserSession, error) {
+//CheckSession 判断用户的session ID是否存在切有效,如果无效则直接返回错误码给客户端
+func CheckSession(ctx context.Context, c *fiber.Ctx) (*models.UserSession, error) {
 	sessionID := getRequestSessionID(c)
 	if sessionID == "" {
 		return nil, response.WriteAppError(c, common.ErrorSessionExpired, "未传入会话ID")

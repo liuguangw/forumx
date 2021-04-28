@@ -25,7 +25,7 @@ func Register(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckRequest(ctx, c)
+	userSession, err := session.CheckSession(ctx, c)
 	if err != nil || userSession == nil {
 		return err
 	}
@@ -41,10 +41,10 @@ func Register(c *fiber.Ctx) error {
 	}
 	//注册账号
 	clientIP := c.IP()
-	userInfo, registerError := user.Register(ctx, username, req.Nickname,
+	userInfo, err := user.Register(ctx, username, req.Nickname,
 		email, req.Password, clientIP)
-	if registerError != nil {
-		return response.WriteInternalError(c, errors.Wrap(registerError, "数据库服务异常"))
+	if err != nil {
+		return response.WriteInternalError(c, errors.Wrap(err, "数据库服务异常"))
 	}
 	responseData := fiber.Map{
 		"id":       userInfo.ID,

@@ -26,8 +26,8 @@ func TotpVerify(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckRequest(ctx, c)
-	if err != nil {
+	userSession, err := session.CheckSession(ctx, c)
+	if err != nil || userSession == nil {
 		return err
 	}
 	//使用token获取已验证过密码的用户数据

@@ -14,9 +14,9 @@ func Show(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err1 := session.CheckRequest(ctx, c)
-	if err1 != nil || userSession == nil {
-		return err1
+	userSession, err := session.CheckSession(ctx, c)
+	if err != nil || userSession == nil {
+		return err
 	}
 	binData, err := captcha.CreateImage(ctx, userSession)
 	if err != nil {

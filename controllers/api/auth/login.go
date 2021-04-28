@@ -25,18 +25,18 @@ func Login(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err1 := session.CheckRequest(ctx, c)
-	if err1 != nil || userSession == nil {
-		return err1
+	userSession, err := session.CheckSession(ctx, c)
+	if err != nil || userSession == nil {
+		return err
 	}
 	//检测验证码
 	if !captcha.CheckCode(ctx, userSession, req.CaptchaCode, true) {
 		return response.WriteAppError(c, common.ErrorInputFieldInvalid, "验证码错误")
 	}
 	//判断密码是否正确
-	userInfo, dbErr := user.FindUserByUsername(ctx, req.Username)
-	if dbErr != nil {
-		return response.WriteInternalError(c, errors.Wrap(dbErr, "find user "+req.Username+" failed"))
+	userInfo, err := user.FindUserByUsername(ctx, req.Username)
+	if err != nil {
+		return response.WriteInternalError(c, errors.Wrap(err, "find user "+req.Username+" failed"))
 	}
 	if userInfo == nil {
 		return response.WriteAppError(c, common.ErrorUserNotFound, "不存在此用户")
@@ -59,7 +59,7 @@ func Login(c *fiber.Ctx) error {
 	//生成临时的totp token缓存
 	totpAuthToken, err := user.PrepareTotpAuth(ctx, userID)
 	if err != nil {
-		return response.WriteInternalError(c, errors.Wrap(err1, "prepare totp auth for "+req.Username+" failed"))
+		return response.WriteInternalError(c, errors.Wrap(err, "prepare totp auth for "+req.Username+" failed"))
 	}
 	totpResponse := &common.AppResponse{
 		Code:    common.ErrorNeedAuthentication,
