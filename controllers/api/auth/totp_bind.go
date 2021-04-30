@@ -26,9 +26,9 @@ func TotpBind(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckLogin(ctx, c)
-	if err != nil || userSession == nil {
-		return err
+	userSession, sessionErr := session.CheckLogin(ctx, c)
+	if sessionErr != nil {
+		return sessionErr.WriteResponse(c)
 	}
 	//判断用户是否已经绑定过令牌了
 	userInfo, err := user.FindUserByID(ctx, userSession.UserID)
@@ -39,15 +39,15 @@ func TotpBind(c *fiber.Ctx) error {
 		return response.WriteAppError(c, common.ErrorCommonMessage, "您的账户已经启用过两步验证了")
 	}
 	//读取令牌信息
-	tokenData, err := totp.LoadKeyDataFromSession(userSession)
-	if err != nil {
+	secretKey, recoveryCode := totp.LoadKeyDataFromSession(userSession)
+	if secretKey == "" || recoveryCode == "" {
 		return response.WriteInternalError(c, errors.Wrap(err, "解码令牌数据失败"))
 	}
 	//验证动态码是否正确
-	if !totp2.Validate(req.Code, tokenData.SecretKey) {
+	if !totp2.Validate(req.Code, secretKey) {
 		return response.WriteAppError(c, common.ErrorTwoFactorAuthenticationCode, "动态验证码错误")
 	}
-	if err := totp.BindUserAccount(ctx, userInfo, tokenData.SecretKey, tokenData.RecoveryCode); err != nil {
+	if err := totp.BindUserAccount(ctx, userInfo, secretKey, recoveryCode); err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "绑定两步验证令牌失败"))
 	}
 	return response.WriteSuccess(c, nil)

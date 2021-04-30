@@ -6,7 +6,6 @@ import (
 	"github.com/liuguangw/forumx/core/request"
 	"github.com/liuguangw/forumx/core/service/captcha"
 	"github.com/liuguangw/forumx/core/service/response"
-	"github.com/liuguangw/forumx/core/service/session"
 	"github.com/liuguangw/forumx/core/service/tools"
 	"github.com/liuguangw/forumx/core/service/user"
 	"github.com/pkg/errors"
@@ -22,15 +21,14 @@ func Register(c *fiber.Ctx) error {
 	if err := req.CheckRequest(); err != nil {
 		return err.WriteResponse(c)
 	}
-	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckSession(ctx, c)
-	if err != nil || userSession == nil {
-		return err
-	}
 	//检测验证码
-	if !captcha.CheckCode(ctx, userSession, req.CaptchaCode, true) {
+	captchaPassed, err := captcha.CheckCode(ctx, req.CaptchaID, req.CaptchaCode, true)
+	if err != nil {
+		return response.WriteAppError(c, common.ErrorInternalServer, "判断验证码出错")
+	}
+	if !captchaPassed {
 		return response.WriteAppError(c, common.ErrorInputFieldInvalid, "验证码错误")
 	}
 	//判断存在性,防止重复

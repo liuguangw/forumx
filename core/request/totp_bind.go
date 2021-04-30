@@ -7,7 +7,7 @@ import (
 
 //TotpBind 绑定二步验证令牌的请求
 type TotpBind struct {
-	Code string `json:"code"` //动态码
+	Code string `json:"code" form:"code"` //动态码
 }
 
 //CheckRequest 检测用户输入

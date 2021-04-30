@@ -11,6 +11,7 @@ type RegisterAccount struct {
 	Nickname     string `json:"nickname" form:"nickname"`           //昵称
 	EmailAddress string `json:"email_address" form:"email_address"` //邮箱地址
 	Password     string `json:"password" form:"password"`           //密码
+	CaptchaID    string `json:"captcha_id" form:"captcha_id"`       //验证码ID
 	CaptchaCode  string `json:"captcha_code" form:"captcha_code"`   //验证码
 }
 
@@ -27,6 +28,9 @@ func (req *RegisterAccount) CheckRequest() *common.AppError {
 	}
 	if req.Password == "" {
 		return common.NewAppError(common.ErrorInputFieldIsEmpty, "密码不能为空")
+	}
+	if req.CaptchaID == "" {
+		return common.NewAppError(common.ErrorInputFieldIsEmpty, "验证码ID不能为空")
 	}
 	if req.CaptchaCode == "" {
 		return common.NewAppError(common.ErrorInputFieldIsEmpty, "验证码不能为空")

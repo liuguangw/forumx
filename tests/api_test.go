@@ -11,33 +11,32 @@ func TestAPI(t *testing.T) {
 	t.Run("migrate", testMigrate)
 	t.Run("cache", testCache)
 	t.Run("index.Hello", func(t *testing.T) {
-		testIndexHello(app, t)
+		testIndexHello(t, app)
 	})
 	var (
+		captchaID string
 		sessionID string
-		userID    int64
 	)
-	t.Run("session.InitNew", func(t *testing.T) {
-		sessionID = testSessionInitNew(app, t)
+	t.Run("captcha.GenerateID", func(t *testing.T) {
+		captchaID = testCaptchaID(t, app)
 	})
 	t.Run("captcha.Show", func(t *testing.T) {
-		testCaptchaShow(app, sessionID, t)
+		testCaptchaShow(t, app, captchaID)
 	})
 	t.Run("auth.Register", func(t *testing.T) {
-		userID = testAuthRegister(app, sessionID, t)
+		testAuthRegister(t, app, captchaID)
 	})
 	t.Run("auth.Login", func(t *testing.T) {
-		testAuthLogin(app, sessionID, t)
+		sessionID = testAuthLogin(t, app, captchaID)
 	})
-	t.Run("auth.MultiFactoryToken", func(t *testing.T) {
-		testRandomToken(app, sessionID, t)
+	t.Run("auth.TotpRandomToken", func(t *testing.T) {
+		testAuthTotpRandomToken(t, app, sessionID)
 	})
-	t.Run("auth.MultiFactoryBind", func(t *testing.T) {
-		testTotpBind(app, sessionID, t)
+	t.Run("auth.TotpBind", func(t *testing.T) {
+		testAuthTotpBind(t, app, sessionID)
 	})
 	//初始化新的session ID
-	sessionID = testSessionInitNew(app, t)
-	t.Run("auth.Login.v2", func(t *testing.T) {
-		testAuth2FALogin(app, sessionID, userID, t)
+	t.Run("auth.TotpVerify", func(t *testing.T) {
+		sessionID = testAuthTotpVerify(t, app, captchaID)
 	})
 }

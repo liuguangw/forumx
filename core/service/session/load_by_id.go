@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//LoadByID 根据sessionID加载session会话
+//LoadByID 根据sessionID加载session会话(只用于包内部和测试)
 func LoadByID(ctx context.Context, sessionID string) (*models.UserSession, error) {
 	itemInfo := new(models.UserSession)
 	coll, err := db.Collection(common.UserSessionCollectionName)

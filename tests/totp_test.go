@@ -17,8 +17,8 @@ import (
 	"time"
 )
 
-//testRandomToken 测试获取随机的totp密钥
-func testRandomToken(app *fiber.App, sessionID string, t *testing.T) {
+//testAuthTotpRandomToken 测试获取随机的totp密钥
+func testAuthTotpRandomToken(t *testing.T, app *fiber.App, sessionID string) {
 	req, err := http.NewRequest(
 		"GET",
 		"/api/auth/totp/random-token",
@@ -50,16 +50,20 @@ func testRandomToken(app *fiber.App, sessionID string, t *testing.T) {
 	assert.NotEmpty(t, responseData.RecoveryCode)
 }
 
-//testTotpBind 测试绑定两步验证令牌
-func testTotpBind(app *fiber.App, sessionID string, t *testing.T) {
+//testAuthTotpBind 测试绑定两步验证令牌
+func testAuthTotpBind(t *testing.T, app *fiber.App, sessionID string) {
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
+	//session状态判断
 	userSession, err := session.LoadByID(ctx, sessionID)
 	assert.NoError(t, err)
+	assert.True(t, userSession.Authenticated)
 	//读取令牌信息
-	tokenData, err := totp.LoadKeyDataFromSession(userSession)
-	assert.NoError(t, err)
-	code, err := totp2.GenerateCode(tokenData.SecretKey, time.Now())
+	secretKey, recoveryCode := totp.LoadKeyDataFromSession(userSession)
+	assert.NotEmpty(t, secretKey)
+	assert.NotEmpty(t, recoveryCode)
+	//计算动态验证码
+	code, err := totp2.GenerateCode(secretKey, time.Now())
 	assert.NoError(t, err)
 	requestData, err := json.Marshal(map[string]string{
 		"code": code,
@@ -87,28 +91,32 @@ func testTotpBind(app *fiber.App, sessionID string, t *testing.T) {
 	assert.Equal(t, 0, appResponse.Code, appResponse.Message)
 }
 
-//testAuth2FALogin 测试两步验证登录
-func testAuth2FALogin(app *fiber.App, sessionID string, userID int64, t *testing.T) {
-	captchaCode := testCaptchaShow(app, sessionID, t)
+//testAuthTotpVerify 测试两步验证登录
+func testAuthTotpVerify(t *testing.T, app *fiber.App, captchaID string) string {
+	captchaCode := testCaptchaShow(t, app, captchaID)
 	//构造请求数据
 	loginRequest := &request.LoginAccount{
 		Username:    "liuguang",
 		Password:    "123456",
+		CaptchaID:   captchaID,
 		CaptchaCode: captchaCode,
 	}
-	appResponse := requestLoginAPI(app, sessionID, loginRequest, t)
+	appResponse := requestLoginAPI(t, app, loginRequest)
 	//需要身份验证
 	assert.Equal(t, common.ErrorNeedAuthentication, appResponse.Code, appResponse.Message)
 	responseData := appResponse.Data
 	assert.NotNil(t, responseData)
-	totpToken := responseData.Token
-	assert.NotEmpty(t, totpToken)
-	//判断session 状态
+	assert.NotNil(t, responseData.ID)
+	assert.NotNil(t, responseData.SessionID)
+	assert.NotNil(t, responseData.ExpiresIn)
+	sessionID := responseData.SessionID
+	userID := responseData.ID
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
+	//session状态判断
 	userSession, err := session.LoadByID(ctx, sessionID)
 	assert.NoError(t, err)
-	assert.Empty(t, userSession.UserID)
+	assert.False(t, userSession.Authenticated)
 	//根据userID获取密钥
 	totpKeyData, err := totp.FindTotpKeyByUserID(ctx, userID)
 	assert.NoError(t, err)
@@ -117,8 +125,7 @@ func testAuth2FALogin(app *fiber.App, sessionID string, userID int64, t *testing
 	code, err := totp2.GenerateCode(secretKey, time.Now())
 	assert.NoError(t, err)
 	verifyRequest := map[string]string{
-		"token": totpToken,
-		"code":  code,
+		"code": code,
 	}
 	requestData, err := json.Marshal(verifyRequest)
 	assert.NoError(t, err)
@@ -142,9 +149,5 @@ func testAuth2FALogin(app *fiber.App, sessionID string, userID int64, t *testing
 	err = json.Unmarshal(body, verifyResponse)
 	assert.NoError(t, err)
 	assert.Equal(t, 0, verifyResponse.Code, verifyResponse.Message)
-	//判断session 状态
-	userSession, err = session.LoadByID(ctx, sessionID)
-	assert.NoError(t, err)
-	userID = userSession.UserID
-	assert.NotEqual(t, 0, userID)
+	return sessionID
 }

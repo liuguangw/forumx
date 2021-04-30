@@ -16,13 +16,13 @@ func TotpRandomToken(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckLogin(ctx, c)
-	if err != nil || userSession == nil {
-		return err
+	userSession, sessionErr := session.CheckLogin(ctx, c)
+	if sessionErr != nil {
+		return sessionErr.WriteResponse(c)
 	}
-	tokenData, err := totp.GenerateRandomKeyData(ctx, userSession)
+	secretKey, recoveryCode, err := totp.GenerateRandomKeyData(ctx, userSession)
 	if err != nil {
-		return response.WriteInternalError(c, errors.Wrap(err, "生成totp token失败"))
+		return response.WriteInternalError(c, errors.Wrap(err, "生成totp密钥失败"))
 	}
 	//获取用户信息
 	userInfo, err := user.FindUserByID(ctx, userSession.UserID)
@@ -33,10 +33,10 @@ func TotpRandomToken(c *fiber.Ctx) error {
 	username := userInfo.Username
 	siteEnName := environment.SiteEnName()
 	totpURL := "otpauth://totp/" + siteEnName + ":" + username +
-		"?secret=" + tokenData.SecretKey + "&issuer=" + siteEnName
+		"?secret=" + secretKey + "&issuer=" + siteEnName
 	responseData := map[string]string{
 		"url":           totpURL,
-		"recovery_code": tokenData.RecoveryCode,
+		"recovery_code": recoveryCode,
 	}
 	return response.WriteSuccess(c, responseData)
 }

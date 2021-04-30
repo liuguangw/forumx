@@ -9,6 +9,7 @@ import (
 type LoginAccount struct {
 	Username    string `json:"username" form:"username"`         //用户名
 	Password    string `json:"password" form:"password"`         //密码
+	CaptchaID   string `json:"captcha_id" form:"captcha_id"`     //验证码ID
 	CaptchaCode string `json:"captcha_code" form:"captcha_code"` //验证码
 }
 
@@ -19,6 +20,9 @@ func (req *LoginAccount) CheckRequest() *common.AppError {
 	}
 	if req.Password == "" {
 		return common.NewAppError(common.ErrorInputFieldIsEmpty, "密码不能为空")
+	}
+	if req.CaptchaID == "" {
+		return common.NewAppError(common.ErrorInputFieldIsEmpty, "验证码ID不能为空")
 	}
 	if req.CaptchaCode == "" {
 		return common.NewAppError(common.ErrorInputFieldIsEmpty, "验证码不能为空")

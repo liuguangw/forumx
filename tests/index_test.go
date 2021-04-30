@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func testIndexHello(app *fiber.App, t *testing.T) {
+func testIndexHello(t *testing.T, app *fiber.App) {
 	req, err := http.NewRequest(
 		"GET",
 		"/api/",

@@ -6,7 +6,6 @@ import (
 	"github.com/liuguangw/forumx/controllers/api/auth"
 	"github.com/liuguangw/forumx/controllers/api/captcha"
 	"github.com/liuguangw/forumx/controllers/api/index"
-	"github.com/liuguangw/forumx/controllers/api/session"
 	"github.com/liuguangw/forumx/controllers/api/user"
 )
 
@@ -16,7 +15,7 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Get("/", index.Hello)
 	apiGroup.Get("/panic", index.PanicDemo)
 
-	apiGroup.Post("/session/init", session.InitNew)
+	apiGroup.Post("/captcha/id", captcha.GenerateID)
 	apiGroup.Get("/captcha/show", captcha.Show)
 
 	apiGroup.Post("/auth/register", auth.Register)

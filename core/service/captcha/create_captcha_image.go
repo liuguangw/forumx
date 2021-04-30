@@ -2,8 +2,7 @@ package captcha
 
 import (
 	"context"
-	"github.com/liuguangw/forumx/core/models"
-	"github.com/liuguangw/forumx/core/service/session"
+	"errors"
 	"github.com/mojocn/base64Captcha"
 	"strings"
 )
@@ -11,8 +10,17 @@ import (
 //随机字符串
 const letterBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-//CreateImage 生成图形验证码所需的二进制字节
-func CreateImage(ctx context.Context, userSession *models.UserSession) ([]byte, error) {
+//CreateCaptchaImage 生成图形验证码所需的二进制字节
+func CreateCaptchaImage(ctx context.Context, captchaID string) ([]byte, error) {
+	//判断验证码ID是否已存在
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	cacheExists, _, err := LoadCaptchaCode(ctx, captchaID)
+	if !cacheExists {
+		return nil, errors.New("验证码ID已失效")
+	}
+	//生成验证码
 	captchaDriver := &base64Captcha.DriverString{
 		Height:          60,
 		Width:           165,
@@ -23,12 +31,8 @@ func CreateImage(ctx context.Context, userSession *models.UserSession) ([]byte, 
 	}
 	//generate code string
 	_, _, captchaCode := captchaDriver.GenerateIdQuestionAnswer()
-	userSession.Set(sessionKey, strings.ToLower(captchaCode))
-	//save session
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	if err := session.Save(ctx, userSession); err != nil {
+	//save cache
+	if err := cacheCaptchaCode(ctx, captchaID, strings.ToLower(captchaCode)); err != nil {
 		return nil, err
 	}
 	//draw

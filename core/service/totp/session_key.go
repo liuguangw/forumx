@@ -1,3 +1,6 @@
 package totp
 
-const sessionKey = "totp_token_data" //token数据存储的Session key
+const (
+	secretKeySessionKey    = "totp_tmp.secret_key"    //totp密钥key
+	recoveryCodeSessionKey = "totp_tmp.recovery_code" //恢复代码key
+)

@@ -15,9 +15,9 @@ func Info(c *fiber.Ctx) error {
 	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckLogin(ctx, c)
-	if err != nil || userSession == nil {
-		return err
+	userSession, sessionError := session.CheckLogin(ctx, c)
+	if sessionError != nil {
+		return sessionError.WriteResponse(c)
 	}
 	//处理用户信息的展示
 	userID := userSession.UserID

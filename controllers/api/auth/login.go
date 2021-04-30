@@ -22,15 +22,14 @@ func Login(c *fiber.Ctx) error {
 	if err := req.CheckRequest(); err != nil {
 		return err.WriteResponse(c)
 	}
-	//加载session
 	ctx, cancel := tools.DefaultExecContext()
 	defer cancel()
-	userSession, err := session.CheckSession(ctx, c)
-	if err != nil || userSession == nil {
-		return err
-	}
 	//检测验证码
-	if !captcha.CheckCode(ctx, userSession, req.CaptchaCode, true) {
+	captchaPassed, err := captcha.CheckCode(ctx, req.CaptchaID, req.CaptchaCode, true)
+	if err != nil {
+		return response.WriteAppError(c, common.ErrorInternalServer, "判断验证码出错")
+	}
+	if !captchaPassed {
 		return response.WriteAppError(c, common.ErrorInputFieldInvalid, "验证码错误")
 	}
 	//判断密码是否正确
@@ -45,28 +44,23 @@ func Login(c *fiber.Ctx) error {
 		return response.WriteAppError(c, common.ErrorPassword, "用户名或密码错误")
 	}
 	userID := userInfo.ID
-	//未开启两步验证的直接登录成功
-	if !userInfo.Enable2FA {
-		if err := session.LoginUser(ctx, userSession, userID); err != nil {
-			return response.WriteInternalError(c, errors.Wrap(err, "用户登录失败"))
-		}
-		responseData := map[string]interface{}{
-			"id":       userID,
-			"nickname": userInfo.Nickname,
-		}
+	//没有启用双重认证的用户直接通过身份验证
+	authenticated := !userInfo.Enable2FA
+	userSession, expiresIn, err := session.LoginUser(ctx, userID, authenticated)
+	if err != nil {
+		return response.WriteInternalError(c, errors.Wrap(err, "登录出错"))
+	}
+	responseData := map[string]interface{}{
+		"id":         userID,
+		"session_id": userSession.ID,
+		"expires_in": expiresIn,
+	}
+	if authenticated {
 		return response.WriteSuccess(c, responseData)
 	}
-	//生成临时的totp token缓存
-	totpAuthToken, err := user.PrepareTotpAuth(ctx, userID)
-	if err != nil {
-		return response.WriteInternalError(c, errors.Wrap(err, "prepare totp auth for "+req.Username+" failed"))
-	}
-	totpResponse := &common.AppResponse{
+	return response.Write(c, &common.AppResponse{
 		Code:    common.ErrorNeedAuthentication,
 		Message: "需要二次验证",
-		Data: map[string]string{
-			"token": totpAuthToken,
-		},
-	}
-	return response.Write(c, totpResponse)
+		Data:    responseData,
+	})
 }
