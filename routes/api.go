@@ -23,6 +23,7 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Get("/auth/totp/random-token", auth.TotpRandomToken)
 	apiGroup.Post("/auth/totp/bind", auth.TotpBind)
 	apiGroup.Post("/auth/totp/verify", auth.TotpVerify)
+	apiGroup.Post("/auth/send-mobile-code", auth.SendMobileCode)
 
 	apiGroup.Get("/user/info", user.Info)
 }

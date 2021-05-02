@@ -16,6 +16,7 @@ func allMigrations() []Migration {
 		new(migrations.CreateUserTotpKeysCollection),
 		new(migrations.CreateCachesCollection),
 		new(migrations.CreateAppConfigsCollection),
+		new(migrations.InitAppConfigsCollection),
 	}
 	return migrationList
 }

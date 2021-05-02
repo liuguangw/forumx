@@ -74,6 +74,7 @@ func requestTencentSmsAPI(ctx context.Context, secretID, secretKey, smsSdkAppID,
 	requestTime := time.Now()
 	requestTimestamp := requestTime.Unix()
 	requestDate := requestTime.UTC().Format("2006-01-02")
+	//fmt.Println("time="+requestTime.UTC().Format("2006-01-02 15:04:05"))
 	authorization := getSmsAPIAuthorization(apiHost, requestBody, requestTimestamp, requestDate,
 		secretID, secretKey)
 	client := resty.New().
@@ -120,7 +121,7 @@ func requestTencentSmsAPI(ctx context.Context, secretID, secretKey, smsSdkAppID,
 		return errors.New("[" + responseError.Code + "]" + responseError.Message)
 	}
 	sendStatus := responseData.Response.SendStatusSet[0]
-	if sendStatus.Code != "OK" {
+	if sendStatus.Code != "Ok" {
 		return errors.New("[" + sendStatus.Code + "]" + sendStatus.Message)
 	}
 	return nil
@@ -129,20 +130,22 @@ func requestTencentSmsAPI(ctx context.Context, secretID, secretKey, smsSdkAppID,
 //getSmsAPIAuthorization 计算签名
 func getSmsAPIAuthorization(apiHost, requestBody string, requestTimestamp int64, requestDate, secretID, secretKey string) string {
 	algorithm := "TC3-HMAC-SHA256"
-	canonicalHeaders := "content-type:application/json;\n" + "host:" + apiHost + "\n"
+	canonicalHeaders := "content-type:application/json\n" + "host:" + apiHost + "\n"
 	signedHeaders := "content-type;host"
 	hashedRequestPayload := sha256Hex(requestBody)
 	canonicalRequest := "POST\n/\n\n" +
 		canonicalHeaders + "\n" +
 		signedHeaders + "\n" + hashedRequestPayload
+	//fmt.Println("canonicalRequest=" + canonicalRequest)
 
 	serviceName := "sms"
 	credentialScope := requestDate + "/" + serviceName + "/tc3_request"
 	hashedCanonicalRequest := sha256Hex(canonicalRequest)
 	stringToSign := algorithm + "\n" +
-		strconv.FormatInt(requestTimestamp, 10) +
-		credentialScope +
+		strconv.FormatInt(requestTimestamp, 10) + "\n" +
+		credentialScope + "\n" +
 		hashedCanonicalRequest
+	//fmt.Println("stringToSign=" + stringToSign)
 
 	secretDate := hmacSha256(requestDate, "TC3"+secretKey)
 	secretService := hmacSha256(serviceName, secretDate)

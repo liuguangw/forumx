@@ -1,0 +1,68 @@
+package auth
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/liuguangw/forumx/core/common"
+	"github.com/liuguangw/forumx/core/models"
+	"github.com/liuguangw/forumx/core/request"
+	"github.com/liuguangw/forumx/core/service/captcha"
+	"github.com/liuguangw/forumx/core/service/response"
+	"github.com/liuguangw/forumx/core/service/session"
+	"github.com/liuguangw/forumx/core/service/sms"
+	"github.com/liuguangw/forumx/core/service/tools"
+	"github.com/liuguangw/forumx/core/service/user"
+	"github.com/pkg/errors"
+)
+
+//SendMobileCode 处理发送短信验证码(绑定手机需要登录状态,重置密码无需登录)
+func SendMobileCode(c *fiber.Ctx) error {
+	//获取所需参数
+	req, requestErr := request.NewSendSms(c)
+	if requestErr != nil {
+		return requestErr.WriteResponse(c)
+	}
+	if err := req.CheckRequest(); err != nil {
+		return err.WriteResponse(c)
+	}
+	ctx, cancel := tools.DefaultExecContext()
+	defer cancel()
+	//检测图形验证码
+	captchaPassed, err := captcha.CheckCode(ctx, req.CaptchaID, req.CaptchaCode, true)
+	if err != nil {
+		return response.WriteAppError(c, common.ErrorInternalServer, "判断图形验证码出错")
+	}
+	if !captchaPassed {
+		return response.WriteAppError(c, common.ErrorInputFieldInvalid, "图形验证码错误")
+	}
+	//判断用户是否已经登录
+	var userID int64
+	if req.CodeType == models.MobileCodeTypeBindAccount {
+		userSession, sessionErr := session.CheckLogin(ctx, c)
+		if sessionErr != nil {
+			return sessionErr.WriteResponse(c)
+		}
+		userID = userSession.UserID
+	}
+	//todo 重置密码时ID的获取
+	//获取用户信息
+	userInfo, err := user.FindUserByID(ctx, userID)
+	if err != nil {
+		return response.WriteInternalError(c, errors.Wrap(err, "获取用户信息失败"))
+	}
+	codeLog := &models.UserMobileCode{
+		Mobile:   req.Mobile,
+		CodeType: req.CodeType,
+		UserID:   userID,
+		CodeUsed: false,
+	}
+	if req.CodeType == models.MobileCodeTypeBindAccount {
+		if userInfo.MobileVerified {
+			return response.WriteAppError(c, common.ErrorCommonMessage, "你的账号已经绑定过手机了")
+		}
+	}
+	//发送短信验证码
+	if err := sms.SendSms(ctx, codeLog); err != nil {
+		return response.WriteAppError(c, common.ErrorCommonMessage, err.Error())
+	}
+	return response.WriteSuccess(c, nil)
+}
