@@ -11,4 +11,5 @@ const (
 	UserSessionCollectionName    = "user_sessions"     //用户会话数据集合
 	UserTotpKeyCollectionName    = "user_totp_keys"    //用户TOTP密钥绑定集合
 	CacheCollectionName          = "caches"            //缓存集合
+	AppConfigCollectionName      = "app_configs"       //应用配置集合
 )

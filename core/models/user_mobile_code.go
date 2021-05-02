@@ -2,12 +2,18 @@ package models
 
 import "time"
 
+//短信验证码类型
 const (
-	_ = iota
-	//MobileCodeTypeBindAccount 绑定手机的验证码
-	MobileCodeTypeBindAccount
-	//MobileCodeTypeResetPassword 重置密码的验证码
-	MobileCodeTypeResetPassword
+	_                           = iota
+	MobileCodeTypeBindAccount   //绑定手机的验证码
+	MobileCodeTypeResetPassword //重置密码的验证码
+)
+
+//短信验证码驱动
+const (
+	_                = iota
+	SmsNullDriver    //测试用的短信验证码驱动(不会发送短信)
+	SmsTencentDriver //使用腾讯云短信API接口
 )
 
 //UserMobileCode 用户绑定手机号、重置密码时发送的短信验证码记录

@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
 	"github.com/liuguangw/forumx/core/environment"
 	"github.com/liuguangw/forumx/core/models"
@@ -14,11 +15,11 @@ type InitCountersCollection struct {
 }
 
 func (*InitCountersCollection) collection() (*mongo.Collection, error) {
-	counterColl, err := db.Collection("counters")
+	coll, err := db.Collection(common.CounterCollectionName)
 	if err != nil {
 		return nil, err
 	}
-	return counterColl, nil
+	return coll, nil
 }
 
 //Name 迁移的名称
