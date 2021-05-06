@@ -36,37 +36,56 @@ func (c *InitAppConfigsCollection) Up() error {
 		&models.AppConfig{
 			ConfigKey:   "sms.driver.type",
 			ConfigType:  models.ConfigTypeNumber,
+			Description: "短信验证码驱动类型",
 			ValueNumber: 1,
 		},
 		&models.AppConfig{
 			ConfigKey:   "tencent.secret_id",
 			ConfigType:  models.ConfigTypeString,
+			Description: "腾讯云API密钥 SecretId",
 			ValueString: "111111111",
 		},
 		&models.AppConfig{
 			ConfigKey:   "tencent.secret_key",
 			ConfigType:  models.ConfigTypeString,
+			Description: "腾讯云API密钥 SecretKey",
 			ValueString: "KeyKeyKey",
 		},
 		&models.AppConfig{
 			ConfigKey:   "tencent.sms_sdk.app_id",
 			ConfigType:  models.ConfigTypeString,
+			Description: "腾讯云短信应用SDK AppID",
 			ValueString: "11223344",
 		},
 		&models.AppConfig{
 			ConfigKey:   "sms.tencent.sign_text",
 			ConfigType:  models.ConfigTypeString,
+			Description: "腾讯云短信签名",
 			ValueString: "流光网",
 		},
 		&models.AppConfig{
 			ConfigKey:   "sms.tencent.bind_mobile.template_id",
 			ConfigType:  models.ConfigTypeString,
+			Description: "腾讯云短信模板(绑定手机号)ID",
 			ValueString: "1111111",
 		},
 		&models.AppConfig{
 			ConfigKey:   "sms.tencent.reset_password.template_id",
 			ConfigType:  models.ConfigTypeString,
+			Description: "腾讯云短信模板(重置密码验证码)ID",
 			ValueString: "1111111",
+		},
+		&models.AppConfig{
+			ConfigKey:   "mobile_code.lifetime.minutes",
+			ConfigType:  models.ConfigTypeNumber,
+			Description: "短信验证码多少分钟内有效",
+			ValueNumber: 15,
+		},
+		&models.AppConfig{
+			ConfigKey:   "mobile_code.store.days",
+			ConfigType:  models.ConfigTypeNumber,
+			Description: "短信验证码记录保存在数据库的天数",
+			ValueNumber: 30,
 		},
 	}
 	if _, err := coll.InsertMany(context.TODO(), itemList); err != nil {
@@ -84,6 +103,7 @@ func (c *InitAppConfigsCollection) Down() error {
 	keyList := []string{
 		"sms.tencent.app_id", "sms.tencent.app_key", "sms.tencent.sign_text",
 		"sms.tencent.bind_mobile.template_id", "sms.tencent.reset_password.template_id",
+		"mobile_code.lifetime.minutes", "mobile_code.store.days",
 	}
 	filter := bson.M{
 		"config_key": bson.M{

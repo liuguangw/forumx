@@ -54,10 +54,9 @@ func (c *CreateUserEmailLinksCollection) Up() error {
 		},
 		{
 			Keys: bson.M{
-				"created_at": 1,
+				"expired_at": 1,
 			},
-			//15分钟后自动失效
-			Options: options.Index().SetName("created_at_ttl").SetExpireAfterSeconds(900),
+			Options: options.Index().SetName("expired_at_ttl").SetExpireAfterSeconds(0),
 		},
 	}
 	indexOpts := options.CreateIndexes().SetMaxTime(2 * time.Second)

@@ -51,7 +51,7 @@ func (c *CreateUserMobileCodesCollection) Up() error {
 			Keys: bson.M{
 				"expired_at": 1,
 			},
-			Options: options.Index().SetName("expired_at_ttl").SetExpireAfterSeconds(1),
+			Options: options.Index().SetName("expired_at_ttl").SetExpireAfterSeconds(0),
 		},
 	}
 	indexOpts := options.CreateIndexes().SetMaxTime(2 * time.Second)

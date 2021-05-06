@@ -1,4 +1,4 @@
-package auth
+package mobile
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -14,8 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-//SendMobileCode 处理发送短信验证码(绑定手机需要登录状态,重置密码无需登录)
-func SendMobileCode(c *fiber.Ctx) error {
+//SendCode 处理发送短信验证码(绑定手机需要登录状态,重置密码无需登录)
+func SendCode(c *fiber.Ctx) error {
 	//获取所需参数
 	req, requestErr := request.NewSendSms(c)
 	if requestErr != nil {

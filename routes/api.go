@@ -6,6 +6,7 @@ import (
 	"github.com/liuguangw/forumx/controllers/api/auth"
 	"github.com/liuguangw/forumx/controllers/api/captcha"
 	"github.com/liuguangw/forumx/controllers/api/index"
+	"github.com/liuguangw/forumx/controllers/api/mobile"
 	"github.com/liuguangw/forumx/controllers/api/user"
 )
 
@@ -23,7 +24,7 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Get("/auth/totp/random-token", auth.TotpRandomToken)
 	apiGroup.Post("/auth/totp/bind", auth.TotpBind)
 	apiGroup.Post("/auth/totp/verify", auth.TotpVerify)
-	apiGroup.Post("/auth/send-mobile-code", auth.SendMobileCode)
+	apiGroup.Post("/mobile/send-code", mobile.SendCode)
 
 	apiGroup.Get("/user/info", user.Info)
 }
