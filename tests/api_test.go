@@ -39,4 +39,7 @@ func TestAPI(t *testing.T) {
 	t.Run("auth.TotpVerify", func(t *testing.T) {
 		sessionID = testAuthTotpVerify(t, app, captchaID)
 	})
+	t.Run("mobile.SendCode", func(t *testing.T) {
+		testMobileSendCode(t, app, captchaID, sessionID)
+	})
 }
