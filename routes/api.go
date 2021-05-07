@@ -25,6 +25,7 @@ func LoadAPIRoutes(app *fiber.App) {
 	apiGroup.Post("/auth/totp/bind", auth.TotpBind)
 	apiGroup.Post("/auth/totp/verify", auth.TotpVerify)
 	apiGroup.Post("/mobile/send-code", mobile.SendCode)
+	apiGroup.Post("/mobile/bind-account", mobile.BindAccount)
 
 	apiGroup.Get("/user/info", user.Info)
 }

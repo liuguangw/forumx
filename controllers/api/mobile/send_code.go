@@ -6,6 +6,7 @@ import (
 	"github.com/liuguangw/forumx/core/models"
 	"github.com/liuguangw/forumx/core/request"
 	"github.com/liuguangw/forumx/core/service/captcha"
+	"github.com/liuguangw/forumx/core/service/mobile"
 	"github.com/liuguangw/forumx/core/service/response"
 	"github.com/liuguangw/forumx/core/service/session"
 	"github.com/liuguangw/forumx/core/service/sms"
@@ -34,16 +35,25 @@ func SendCode(c *fiber.Ctx) error {
 	if !captchaPassed {
 		return response.WriteAppError(c, common.ErrorInputFieldInvalid, "图形验证码错误")
 	}
-	//判断用户是否已经登录
 	var userID int64
 	if req.CodeType == models.MobileCodeTypeBindAccount {
+		//判断用户是否已经登录
 		userSession, sessionErr := session.CheckLogin(ctx, c)
 		if sessionErr != nil {
 			return sessionErr.WriteResponse(c)
 		}
 		userID = userSession.UserID
+	} else {
+		//重置密码,获取绑定记录
+		bindLog, err := mobile.FindMobileBindLog(ctx, req.Mobile)
+		if err != nil {
+			return response.WriteInternalError(c, errors.Wrap(err, "获取绑定记录失败"))
+		}
+		if bindLog == nil {
+			return response.WriteAppError(c, common.ErrorCommonMessage, "此手机号未绑定任何账号")
+		}
+		userID = bindLog.UserID
 	}
-	//todo 重置密码时ID的获取
 	//获取用户信息
 	userInfo, err := user.FindUserByID(ctx, userID)
 	if err != nil {

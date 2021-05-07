@@ -42,4 +42,7 @@ func TestAPI(t *testing.T) {
 	t.Run("mobile.SendCode", func(t *testing.T) {
 		testMobileSendCode(t, app, captchaID, sessionID)
 	})
+	t.Run("mobile.BindAccount", func(t *testing.T) {
+		testMobileBindAccount(t, app, sessionID)
+	})
 }
