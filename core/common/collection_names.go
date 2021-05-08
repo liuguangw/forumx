@@ -12,4 +12,6 @@ const (
 	UserTotpKeyCollectionName    = "user_totp_keys"    //用户TOTP密钥绑定集合
 	CacheCollectionName          = "caches"            //缓存集合
 	AppConfigCollectionName      = "app_configs"       //应用配置集合
+	ForumAreaCollectionName      = "forum_areas"       //论坛分区集合
+	ForumCollectionName          = "forums"            //论坛集合
 )

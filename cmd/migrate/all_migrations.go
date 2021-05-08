@@ -17,6 +17,10 @@ func allMigrations() []Migration {
 		new(migrations.CreateCachesCollection),
 		new(migrations.CreateAppConfigsCollection),
 		new(migrations.InitAppConfigsCollection),
+		new(migrations.CreateForumAreasCollection),
+		new(migrations.CreateForumsCollection),
+		new(migrations.InitForumAreasCollection),
+		new(migrations.InitForumsCollection),
 	}
 	return migrationList
 }

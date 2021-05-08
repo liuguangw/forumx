@@ -39,8 +39,12 @@ func (c *InitCountersCollection) Up() error {
 			CounterValue: environment.FounderUserID(),
 		},
 		&models.Counter{
+			CounterKey:   "forum_area.next_id",
+			CounterValue: 2,
+		},
+		&models.Counter{
 			CounterKey:   "forum.next_id",
-			CounterValue: 1,
+			CounterValue: 2,
 		},
 		&models.Counter{
 			CounterKey:   "topic.next_id",
