@@ -46,6 +46,8 @@ jobs:
       run: |
         make all appVersion=1.0.0
         ls -al
+      env:
+        CGO_ENABLED: 0
 
     - name: Release
       uses: softprops/action-gh-release@v1
