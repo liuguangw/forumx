@@ -33,7 +33,7 @@ all:
 	$(call build_app,windows,amd64,.exe)
 
 clean:
-	rm -rf ./forumx
+	rm -rf ./$(projectName)
 	rm -rf ./*.zip
 
 .PHONY: build all clean

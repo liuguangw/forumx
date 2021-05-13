@@ -34,21 +34,19 @@ func loadEnvFile() error {
 		return err
 	}
 	envFilePath := filepath.Join(workingDir, envFileName)
-	//如果工作目录下存在环境变量配置文件,则加载配置文件
-	if _, err := os.Stat(envFilePath); os.IsExist(err) {
-		return godotenv.Load(envFilePath)
+	//如果工作目录下的配置文件不存在,则使用二进制文件所在目录
+	if _, err := os.Stat(envFilePath); os.IsNotExist(err) {
+		exeFilePath, err1 := os.Executable()
+		if err1 != nil {
+			return err1
+		}
+		envFilePath = filepath.Join(filepath.Dir(exeFilePath), envFileName)
 	}
-	//使用二进制文件所在目录下的
-	exeFilePath, err := os.Executable()
-	if err != nil {
-		return err
+	//如果文件不存在,则不加载
+	if _, err := os.Stat(envFilePath); os.IsNotExist(err) {
+		return nil
 	}
-	envFilePath = filepath.Join(filepath.Dir(exeFilePath), envFileName)
-	if _, err := os.Stat(envFilePath); os.IsExist(err) {
-		return godotenv.Load(envFilePath)
-	}
-	//如果找不到文件则不加载
-	return nil
+	return godotenv.Load(envFilePath)
 }
 
 //Execute 执行命令行的入口
