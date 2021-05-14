@@ -1,10 +1,13 @@
-package migrate
+package migration
 
-import "github.com/liuguangw/forumx/core/migrations"
+import (
+	"github.com/liuguangw/forumx/core/migrations"
+	"github.com/liuguangw/migration"
+)
 
 //获取应用应该执行的所有迁移对象
-func allMigrations() []Migration {
-	migrationList := []Migration{
+func allMigrations() []migration.Migration {
+	migrationList := []migration.Migration{
 		new(migrations.CreateCountersCollection),
 		new(migrations.CreateUsersCollection),
 		new(migrations.CreateUserEmailLinksCollection),
