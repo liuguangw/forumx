@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/liuguangw/forumx/cmd"
+	"github.com/liuguangw/forumx/app/cmd"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

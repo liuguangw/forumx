@@ -3,11 +3,11 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/liuguangw/forumx/controllers/api/auth"
-	"github.com/liuguangw/forumx/controllers/api/captcha"
-	"github.com/liuguangw/forumx/controllers/api/index"
-	"github.com/liuguangw/forumx/controllers/api/mobile"
-	"github.com/liuguangw/forumx/controllers/api/user"
+	"github.com/liuguangw/forumx/app/controllers/api/auth"
+	"github.com/liuguangw/forumx/app/controllers/api/captcha"
+	"github.com/liuguangw/forumx/app/controllers/api/index"
+	"github.com/liuguangw/forumx/app/controllers/api/mobile"
+	"github.com/liuguangw/forumx/app/controllers/api/user"
 )
 
 //LoadAPIRoutes 加载系统路由和中间件配置

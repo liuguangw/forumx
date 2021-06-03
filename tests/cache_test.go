@@ -2,8 +2,8 @@ package tests
 
 import (
 	"context"
-	"github.com/liuguangw/forumx/core/models"
-	"github.com/liuguangw/forumx/core/service/cache"
+	"github.com/liuguangw/forumx/app/models"
+	"github.com/liuguangw/forumx/app/service/cache"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

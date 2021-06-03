@@ -2,10 +2,10 @@ package migrations
 
 import (
 	"context"
+	"github.com/liuguangw/forumx/app/environment"
+	"github.com/liuguangw/forumx/app/models"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/liuguangw/forumx/core/db"
-	"github.com/liuguangw/forumx/core/environment"
-	"github.com/liuguangw/forumx/core/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
