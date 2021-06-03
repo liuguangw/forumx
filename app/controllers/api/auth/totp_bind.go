@@ -6,7 +6,7 @@ import (
 	"github.com/liuguangw/forumx/app/service/response"
 	"github.com/liuguangw/forumx/app/service/session"
 	"github.com/liuguangw/forumx/app/service/tools"
-	totp3 "github.com/liuguangw/forumx/app/service/totp"
+	"github.com/liuguangw/forumx/app/service/totp"
 	"github.com/liuguangw/forumx/app/service/user"
 	"github.com/liuguangw/forumx/core/common"
 	"github.com/pkg/errors"
@@ -39,7 +39,7 @@ func TotpBind(c *fiber.Ctx) error {
 		return response.WriteAppError(c, common.ErrorCommonMessage, "您的账户已经启用过两步验证了")
 	}
 	//读取令牌信息
-	secretKey, recoveryCode := totp3.LoadKeyDataFromSession(userSession)
+	secretKey, recoveryCode := totp.LoadKeyDataFromSession(userSession)
 	if secretKey == "" || recoveryCode == "" {
 		return response.WriteInternalError(c, errors.Wrap(err, "解码令牌数据失败"))
 	}
@@ -47,7 +47,7 @@ func TotpBind(c *fiber.Ctx) error {
 	if !totp2.Validate(req.Code, secretKey) {
 		return response.WriteAppError(c, common.ErrorTwoFactorAuthenticationCode, "动态验证码错误")
 	}
-	if err := totp3.BindUserAccount(ctx, userInfo, secretKey, recoveryCode); err != nil {
+	if err := totp.BindUserAccount(ctx, userInfo, secretKey, recoveryCode); err != nil {
 		return response.WriteInternalError(c, errors.Wrap(err, "绑定两步验证令牌失败"))
 	}
 	return response.WriteSuccess(c, nil)
